@@ -60,6 +60,7 @@ public class xo extends Activity implements Button.OnClickListener
 						return;
 				}
 				player = t.chooseFirst();
+				isPlaying=true;
 				if (player == 'C')
 				{
 					Toast.makeText(xo.this.getApplicationContext(), "Computer goes first !", Toast.LENGTH_SHORT).show();
@@ -69,7 +70,7 @@ public class xo extends Activity implements Button.OnClickListener
 					Toast.makeText(xo.this.getApplicationContext(), "You goes first !", Toast.LENGTH_SHORT).show();
 			}
 		};
-		chooseXO = new AlertDialog.Builder(xo.this);
+		AlertDialog.Builder chooseXO = new AlertDialog.Builder(xo.this);
 		chooseXO.setMessage("Select X or O")
 			.setPositiveButton("O", chooseXOListener)
 			.setNegativeButton("X", chooseXOListener)
@@ -124,25 +125,21 @@ public class xo extends Activity implements Button.OnClickListener
 		if (move != 0) board[move].setText("" + t.computerLetter + "");
 		if (t.isWinner(t.board, t.computerLetter))
 		{
-			new AlertDialog.Builder(xo.this)
-				.setMessage("You Computer Has Beaten You!\nYou lose.")
-				.setPositiveButton("Ok", gameFinished)
-				.show();
+			Toast.makeText(xo.this.getApplicationContext(), "Computer has beaten you\nYou loose!", Toast.LENGTH_SHORT).show();		
+			isPlaying = false;
 		}
 		else
 		if (t.isFull())
 		{
-			new AlertDialog.Builder(xo.this)
-				.setMessage("The Game Is A Tie")
-				.setPositiveButton("Ok", gameFinished)
-				.show();				
+			Toast.makeText(xo.this.getApplicationContext(), "The Game is a tie !", Toast.LENGTH_SHORT).show();			
+			isPlaying = false;
 		}
 		else
 			player = 'P';
 	}
 	void toggleText(int _pos)
 	{
-		if (board[_pos].getText().charAt(0) == '-')
+		if (t.isFree(pos)  && board[_pos].getText().charAt(0) == '-')
 		{
 			board[_pos].setText("" + t.playerLetter + "");
 		}
@@ -159,40 +156,35 @@ public class xo extends Activity implements Button.OnClickListener
 	@Override
 	public void onClick(View p1)
 	{
-		isPlaying = true;
-		if (player == 'P')
+		if(p1.getId() == R.id.reset) this.recreate();
+		if (isPlaying && player == 'P')
 		{
 			switch (p1.getId())
 			{
-				case R.id.TL: pos = 1; if (t.isFree(pos)) toggleText(pos); break;
-				case R.id.TM: pos = 2; if (t.isFree(pos)) toggleText(pos); break;
-				case R.id.TR: pos = 3; if (t.isFree(pos)) toggleText(pos); break;
-				case R.id.ML: pos = 4; if (t.isFree(pos)) toggleText(pos); break;
-				case R.id.MM: pos = 5; if (t.isFree(pos)) toggleText(pos); break;
-				case R.id.MR: pos = 6; if (t.isFree(pos)) toggleText(pos); break;
-				case R.id.BL: pos = 7; if (t.isFree(pos)) toggleText(pos); break;
-				case R.id.BM: pos = 8; if (t.isFree(pos)) toggleText(pos); break;
-				case R.id.BR: pos = 9; if (t.isFree(pos)) toggleText(pos); break;
-				case R.id.reset: this.recreate(); break;
-				case R.id.confirm: 
+				case R.id.TL: pos = 1; toggleText(pos); break;
+				case R.id.TM: pos = 2; toggleText(pos); break;
+				case R.id.TR: pos = 3; toggleText(pos); break;
+				case R.id.ML: pos = 4; toggleText(pos); break;
+				case R.id.MM: pos = 5; toggleText(pos); break;
+				case R.id.MR: pos = 6; toggleText(pos); break;
+				case R.id.BL: pos = 7; toggleText(pos); break;
+				case R.id.BM: pos = 8; toggleText(pos); break;
+				case R.id.BR: pos = 9; toggleText(pos); break;
+				case R.id.confirm:
 					if (t.isFree(pos))
-					{
+					{	
 						t.makeMove(t.board, pos, t.playerLetter);
 						board[pos].setText("" + t.playerLetter + "");
 						if (t.isWinner(t.board, t.playerLetter))
 						{
-							new AlertDialog.Builder(xo.this)
-								.setMessage("You Won The Game !")
-								.setPositiveButton("Ok", gameFinished)
-								.show();
+							Toast.makeText(xo.this.getApplicationContext(), "You won the game !", Toast.LENGTH_SHORT).show();
+							isPlaying = false;
 						}
 						else
 						if (t.isFull())
 						{
-							new AlertDialog.Builder(xo.this)
-								.setMessage("The Game Is A Tie")
-								.setPositiveButton("Ok", gameFinished)
-								.show();
+							Toast.makeText(xo.this.getApplicationContext(), "The Game is a tie !", Toast.LENGTH_SHORT).show();			
+							isPlaying = false;
 						}
 						else
 							player = 'C';
@@ -200,7 +192,7 @@ public class xo extends Activity implements Button.OnClickListener
 					break;
 			}
 		}
-		if (player == 'C')
+		if (isPlaying && player == 'C')
 		{
 			playComputer();
 		}
