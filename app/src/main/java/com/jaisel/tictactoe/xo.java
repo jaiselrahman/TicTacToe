@@ -4,6 +4,7 @@ import android.app.*;
 import android.content.*;
 import android.content.res.*;
 import android.os.*;
+import android.util.*;
 import android.view.*;
 import android.widget.*;
 
@@ -11,37 +12,34 @@ import android.widget.*;
 public class xo extends Activity implements Button.OnClickListener
 {
 	AlertDialog.Builder chooseXO;
-	DialogInterface.OnClickListener gameFinished;
-	ttt t;
+	DialogInterface.OnClickListener gameFinished = new DialogInterface.OnClickListener()
+	{
+		@Override
+		public void onClick(DialogInterface dialog, int which)
+		{
+			recreate();
+		}
+	};
+	
+	ttt t = new ttt();
 	char player='P';
 	boolean isPlaying=false;
-	Button board[];
+	Button board[] = new Button[10];
 	Button reset,confirm;
+	FragmentManager FM ;
+	FragmentTransaction FT;
+	landscape_fragment lf=new landscape_fragment();
+	portrait_fragment pf = new portrait_fragment();
 	int pos=0;
+	
 	@Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.xoboard);
-		t = new ttt();
-		board = new Button[10];
-		board[1] = (Button)findViewById(R.id.TL);
-		board[2] = (Button)findViewById(R.id.TM);
-		board[3] = (Button)findViewById(R.id.TR);
-		board[4] = (Button)findViewById(R.id.ML);
-		board[5] = (Button)findViewById(R.id.MM);
-		board[6] = (Button)findViewById(R.id.MR);
-		board[7] = (Button)findViewById(R.id.BL);
-		board[8] = (Button)findViewById(R.id.BM);
-		board[9] = (Button)findViewById(R.id.BR);
-		for (int i=1;i < 10;i++)
-		{
-			board[i].setOnClickListener(this);
-		}
-		reset = (Button)findViewById(R.id.reset);
-		reset.setOnClickListener(this);
-		confirm = (Button)findViewById(R.id.confirm);
-		confirm.setOnClickListener(this);
+		FM=getFragmentManager();
+		FT=FM.beginTransaction();
+		FT.replace(android.R.id.content,new portrait_fragment());
+		FT.commit();
 		DialogInterface.OnClickListener chooseXOListener = new DialogInterface.OnClickListener()
 		{
 			@Override
@@ -69,7 +67,6 @@ public class xo extends Activity implements Button.OnClickListener
 				}
 				else
 					Toast.makeText(xo.this.getApplicationContext(), "You goes first !", Toast.LENGTH_SHORT).show();
-
 			}
 		};
 		chooseXO = new AlertDialog.Builder(xo.this);
@@ -79,15 +76,20 @@ public class xo extends Activity implements Button.OnClickListener
 			.setNeutralButton("Exit", chooseXOListener)
 			.setCancelable(false)
 			.show();
-		gameFinished = new DialogInterface.OnClickListener()
-		{
-			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
-				recreate();
-			}
-		};
 	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig)
+	{
+		super.onConfigurationChanged(newConfig);
+		FT=FM.beginTransaction();
+		if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+			FT.replace(android.R.id.content,new landscape_fragment());
+		else
+			FT.replace(android.R.id.content,new portrait_fragment());
+		FT.commit();	
+	}
+	
 	@Override
 	public void onBackPressed()
 	{
@@ -140,7 +142,6 @@ public class xo extends Activity implements Button.OnClickListener
 	}
 	void toggleText(int _pos)
 	{
-
 		if (board[_pos].getText().charAt(0) == '-')
 		{
 			board[_pos].setText("" + t.playerLetter + "");
@@ -204,4 +205,46 @@ public class xo extends Activity implements Button.OnClickListener
 			playComputer();
 		}
 	}
+	void init(View v)
+	{
+		board[1] = (Button)v.findViewById(R.id.TL);
+		board[2] = (Button)v.findViewById(R.id.TM);
+		board[3] = (Button)v.findViewById(R.id.TR);
+		board[4] = (Button)v.findViewById(R.id.ML);
+		board[5] = (Button)v.findViewById(R.id.MM);
+		board[6] = (Button)v.findViewById(R.id.MR);
+		board[7] = (Button)v.findViewById(R.id.BL);
+		board[8] = (Button)v.findViewById(R.id.BM);
+		board[9] = (Button)v.findViewById(R.id.BR);
+		for (int i=1;i < 10;i++)
+		{
+			board[i].setOnClickListener(this);
+		}
+		reset = (Button)v.findViewById(R.id.reset);
+		reset.setOnClickListener(this);
+		confirm = (Button)v.findViewById(R.id.confirm);
+		confirm.setOnClickListener(this);
+	}
+
+	public class landscape_fragment extends Fragment
+	{
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		{
+			View v = inflater.inflate(R.layout.xoboard_landscape,container,false);
+			init(v);
+			return v;
+		}
+	}
+	public class portrait_fragment extends Fragment
+	{
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		{
+			View v = inflater.inflate(R.layout.xoboard,container,false);
+			init (v);
+			return v;
+		}
+	}
 }
+	

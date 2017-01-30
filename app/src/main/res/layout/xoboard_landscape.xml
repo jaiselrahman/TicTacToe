@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="match_parent"
+	android:layout_width="match_parent">
+
+	<TableLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:id="@+id/XOBoardTableLayout1"
+		android:layout_centerVertical="true"
+		android:layout_marginLeft="20dp">
+
+		<TableRow
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content">
+
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="-"
+				android:id="@+id/TL"
+				android:height="80dp"/>
+
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="-"
+				android:id="@+id/TM"
+				android:height="80dp"/>
+
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="-"
+				android:id="@+id/TR"
+				android:height="80dp"/>
+
+		</TableRow>
+
+		<TableRow
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content">
+
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="-"
+				android:id="@+id/ML"
+				android:height="80dp"/>
+
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="-"
+				android:id="@+id/MM"
+				android:height="80dp"/>
+
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="-"
+				android:id="@+id/MR"
+				android:height="80dp"/>
+
+		</TableRow>
+
+		<TableRow
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content">
+
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="-"
+				android:id="@+id/BL"
+				android:height="80dp"/>
+
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="-"
+				android:id="@+id/BM"
+				android:height="80dp"/>
+
+			<Button
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="-"
+				android:id="@+id/BR"
+				android:height="80dp"/>
+
+		</TableRow>
+
+	</TableLayout>
+
+	<Button
+		style="?android:attr/buttonStyleSmall"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="   Reset   "
+		android:id="@+id/reset"
+		android:layout_alignParentRight="true"
+		android:layout_alignTop="@id/XOBoardTableLayout1"
+		android:layout_margin="20dp"/>
+
+	<Button
+		style="?android:attr/buttonStyleSmall"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text=" Confirm "
+		android:id="@+id/confirm"
+		android:layout_alignParentRight="true"
+		android:layout_alignBottom="@id/XOBoardTableLayout1"
+		android:layout_margin="20dp"/>
+
+</RelativeLayout>
+

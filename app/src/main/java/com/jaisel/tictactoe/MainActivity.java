@@ -5,26 +5,25 @@ import android.content.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
-import android.graphics.*;
 
 public class MainActivity extends Activity 
 {
 	private Menu menu;
+	FragmentManager FM ;
+	FragmentTransaction FT;
+	MainFragment mf= new MainFragment();
+	AboutFragment af = new AboutFragment();
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-		Button Computer = (Button)findViewById(R.id.computer);
-		Computer.setOnClickListener(new View.OnClickListener()
-			{
-				public void onClick(View v)
-				{
-					Intent i=new Intent(getApplicationContext(), xo.class);
-					startActivityForResult(i, 0);
-				}
-			});	
-    }
+		FM = getFragmentManager();
+		FT = FM.beginTransaction();
+		FT.replace(android.R.id.content,mf);
+		FT.commit();
+	//	mf.setRetainInstance(true);
+	//	af.setRetainInstance(true);
+	}
 	@Override
     public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -38,9 +37,11 @@ public class MainActivity extends Activity
         switch (item.getItemId())
 		{
 			case R.id.about:
-				setContentView(R.layout.about);
 				menu.setGroupVisible(R.id.menu_group,false);
-				inmenu = true;
+				FT = FM.beginTransaction();
+				FT.replace(android.R.id.content,af);
+				FT.commit();
+				inmenu=true;
 				return true;
 			case R.id.exit:
 				System.exit(0);
@@ -54,7 +55,9 @@ public class MainActivity extends Activity
 	{
 		if (inmenu)
 		{
-			this.recreate();
+			FT = FM.beginTransaction();
+			FT.replace(android.R.id.content,mf);
+			FT.commit();
 			menu.setGroupVisible(R.id.menu_group,true);
 			inmenu = false;
 		}
@@ -62,6 +65,34 @@ public class MainActivity extends Activity
 			super.onBackPressed();
 	}
 }
+
+class AboutFragment extends Fragment
+{
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+		return inflater.inflate(R.layout.about,container,false);
+	}
+}
+class MainFragment extends Fragment
+{	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+		View v= inflater.inflate(R.layout.main,container,false);
+		Button Computer = (Button)v.findViewById(R.id.computer);
+		Computer.setOnClickListener(new View.OnClickListener()
+			{
+				public void onClick(View v)
+				{
+					Intent i=new Intent(getActivity(), xo.class);
+					startActivityForResult(i, 0);
+				}
+			});
+		return v;
+	}
+}
+
 class ttt
 {
 	char board[]={'-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
@@ -171,5 +202,3 @@ class ttt
 		return randomMove(c2);
 	}
 }
-
-

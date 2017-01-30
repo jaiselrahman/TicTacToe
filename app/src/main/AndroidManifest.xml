@@ -19,6 +19,5 @@
             android:name="xo"
 			android:parentActivityName=".MainActivity">
         </activity>
-    </application>
-
+	</application>
 </manifest>
