@@ -2,7 +2,6 @@ package com.jaisel.tictactoe;
 
 import android.app.*;
 import android.content.*;
-import android.content.res.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
@@ -68,7 +67,6 @@ public class xo extends Activity implements Button.OnClickListener
 				}
 				else
 					Toast.makeText(xo.this.getApplicationContext(), "You goes first !", Toast.LENGTH_SHORT).show();
-
 			}
 		};
 		AlertDialog.Builder chooseXO = new AlertDialog.Builder(xo.this);
@@ -127,13 +125,16 @@ public class xo extends Activity implements Button.OnClickListener
 	}
 	void toggleText(int _pos)
 	{
-		if (t.isFree(pos)  && board[_pos].getText().charAt(0) == '-')
+		if(t.isFree(_pos))
 		{
-			board[_pos].setText("" + t.playerLetter + "");
-		}
-		else
-		{
-			board[_pos].setText("-");
+			if (board[_pos].getText().charAt(0) == '-')
+			{
+				board[_pos].setText("" + t.playerLetter + "");
+			}	
+			else 
+			{
+				board[_pos].setText("-");
+			}
 		}
 		for (int i=1;i < 10;i++)
 		{
