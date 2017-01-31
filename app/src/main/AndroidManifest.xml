@@ -16,8 +16,7 @@
             </intent-filter>
         </activity>
 		<activity
-            android:name="xo"
-			android:parentActivityName=".MainActivity">
+            android:name="xo">
         </activity>
 	</application>
 </manifest>
