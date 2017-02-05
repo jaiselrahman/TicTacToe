@@ -24,6 +24,28 @@ public class MainActivity extends Activity
 	//	mf.setRetainInstance(true);
 	//	af.setRetainInstance(true);
 	}
+        setContentView(R.layout.main);
+		Button Computer = (Button)findViewById(R.id.computer);
+		Computer.setOnClickListener(new View.OnClickListener()
+			{
+				public void onClick(View v)
+				{
+					xo.player2 ='C';
+					Intent i=new Intent(getApplicationContext(), xo.class);
+					startActivityForResult(i, 0);
+				}
+			});
+		Button Player = (Button)findViewById(R.id.player);
+		Player.setOnClickListener(new View.OnClickListener()
+			{
+				public void onClick(View v)
+				{
+					xo.player2 = 'O';
+					Intent i=new Intent(getApplicationContext(), xo.class);
+					startActivityForResult(i, 0);
+				}
+			});
+    }
 	@Override
     public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -97,7 +119,7 @@ class ttt
 {
 	char board[]={'-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
 	char computerLetter='O', playerLetter='X';
-	char first='P',second='C';
+	char first='P',second='Q';
 	boolean isWinner(char tboard[], char l)
 	{
 		return ((tboard[1] == l && tboard[2] == l && tboard[3] == l) ||
@@ -154,14 +176,14 @@ class ttt
 		if ((int)(Math.random() * 10) % 2 == 0)
 		{
 			first = 'P';
-			second = 'C';
+			second = 'Q';
 			return 'P';
 		}
 		else 
 		{
-			first = 'C';
+			first = 'Q';
 			second = 'P';
-			return 'C';
+			return 'Q';
 		}
 	}
 	int compMove()
