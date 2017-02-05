@@ -2,6 +2,7 @@ package com.jaisel.tictactoe;
 
 import android.app.*;
 import android.content.*;
+import android.content.res.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
@@ -38,7 +39,6 @@ public class xo extends Activity implements Button.OnClickListener
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState)
-<<<<<<< HEAD
     {
         super.onCreate(savedInstanceState);
 		FM=getFragmentManager();

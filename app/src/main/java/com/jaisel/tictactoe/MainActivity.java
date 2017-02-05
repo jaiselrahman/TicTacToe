@@ -23,7 +23,7 @@ public class MainActivity extends Activity
 		FT.commit();
 	//	mf.setRetainInstance(true);
 	//	af.setRetainInstance(true);
-	}
+	
         setContentView(R.layout.main);
 		Button Computer = (Button)findViewById(R.id.computer);
 		Computer.setOnClickListener(new View.OnClickListener()
