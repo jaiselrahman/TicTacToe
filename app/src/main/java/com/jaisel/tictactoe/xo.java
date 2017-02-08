@@ -298,7 +298,8 @@ public class xo extends Activity implements Button.OnClickListener
 			}
 			catch (Exception ex)
 			{
-				Log.d("sendrequest", ex.getMessage());
+				Log.d("sendrequest ", ex.toString());
+				return -1;
 			}
 			finally
 			{
@@ -308,7 +309,7 @@ public class xo extends Activity implements Button.OnClickListener
 				}
 				catch (Exception ex)
 				{
-					Log.d("sendrequest2", ex.getMessage());
+					Log.d("sendrequest2 ", ex.toString());
 					return 0;
 				}
 			}
@@ -325,7 +326,7 @@ public class xo extends Activity implements Button.OnClickListener
 				}
 				catch (Exception ex)
 				{
-					Toast.makeText(null, ex.getMessage(), Toast.LENGTH_SHORT);
+					Log.d("doInBackground ",ex.toString());
 				}
 				return pos;
 			}
@@ -368,8 +369,6 @@ public class xo extends Activity implements Button.OnClickListener
 					+ URLEncoder.encode("set", "UTF-8");	
 				data += "&" + URLEncoder.encode("source", "UTF-8") + "="
 					+ URLEncoder.encode("app", "UTF-8");	
-
-				Toast.makeText(getBaseContext(), data, Toast.LENGTH_SHORT).show();
 				new Request().execute(data);
 			}
 			catch (Exception ex)
