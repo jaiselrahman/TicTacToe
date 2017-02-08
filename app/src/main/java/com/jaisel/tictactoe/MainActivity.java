@@ -9,16 +9,11 @@ import android.widget.*;
 public class MainActivity extends Activity 
 {
 	private Menu menu;
-	FragmentManager FM ;
-	FragmentTransaction FT;
-	MainFragment mf= new MainFragment();
-	AboutFragment af = new AboutFragment();
-    @Override
+	@Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-    //	setContentView(R.layout.main);
-		FragmentManager FM=getFragmentManager();
+  		FragmentManager FM=getFragmentManager();
 		FragmentTransaction FT= FM.beginTransaction();
 		FT.replace(android.R.id.content,new mainFragment());
 		FT.commit();
@@ -61,7 +56,6 @@ public class MainActivity extends Activity
 	{
 		if (inmenu)
 		{
-		//	this.recreate();
 			FragmentManager FM=getFragmentManager();
 			FragmentTransaction FT= FM.beginTransaction();
 			FT.replace(android.R.id.content,new mainFragment());
@@ -102,34 +96,6 @@ public class MainActivity extends Activity
 		}
 	}
 }
-
-class AboutFragment extends Fragment
-{
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-	{
-		return inflater.inflate(R.layout.about,container,false);
-	}
-}
-class MainFragment extends Fragment
-{	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-	{
-		View v= inflater.inflate(R.layout.main,container,false);
-		Button Computer = (Button)v.findViewById(R.id.computer);
-		Computer.setOnClickListener(new View.OnClickListener()
-			{
-				public void onClick(View v)
-				{
-					Intent i=new Intent(getActivity(), xo.class);
-					startActivityForResult(i, 0);
-				}
-			});
-		return v;
-	}
-}
-
 class ttt
 {
 	char board[]={'-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};

@@ -15,7 +15,8 @@
             </intent-filter>
         </activity>
 		<activity
-            android:name="xo">
+            android:name="xo"
+			android:configChanges="orientation|screenSize">
         </activity>
     </application>
 	<uses-permission 

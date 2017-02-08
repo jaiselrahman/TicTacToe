@@ -21,7 +21,6 @@ public class xo extends Activity implements Button.OnClickListener
 			recreate();
 		}
 	};
-	
 	ttt t = new ttt();
 	char player='P';
 	static char player2='C';
@@ -31,20 +30,22 @@ public class xo extends Activity implements Button.OnClickListener
 	boolean isPlaying=false;
 	Button board[] = new Button[10];
 	Button reset,confirm;
-	FragmentManager FM ;
-	FragmentTransaction FT;
-	landscape_fragment lf=new landscape_fragment();
-	portrait_fragment pf = new portrait_fragment();
 	int pos=0;
+	landscape_fragment lf=new landscape_fragment();
+	portrait_fragment pf=new portrait_fragment();
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-		FM=getFragmentManager();
-		FT=FM.beginTransaction();
-		FT.replace(android.R.id.content,new portrait_fragment());
-		FT.commit();
+		FragmentManager FM =getFragmentManager();
+		FragmentTransaction FT=FM.beginTransaction();
+		Configuration newConfig = getResources().getConfiguration();
+		if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+			FT.replace(android.R.id.content, lf);
+		else
+			FT.replace(android.R.id.content, pf);
+		FT.commit();	
 		DialogInterface.OnClickListener chooseXOListener = new DialogInterface.OnClickListener()
 		{
 			@Override
@@ -98,15 +99,39 @@ public class xo extends Activity implements Button.OnClickListener
 	@Override
 	public void onConfigurationChanged(Configuration newConfig)
 	{
-		super.onConfigurationChanged(newConfig);
-		FT=FM.beginTransaction();
+		FragmentManager FM =getFragmentManager();
+		FragmentTransaction FT=FM.beginTransaction();
 		if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
-			FT.replace(android.R.id.content,new landscape_fragment());
+			FT.replace(android.R.id.content, lf);
 		else
-			FT.replace(android.R.id.content,new portrait_fragment());
+			FT.replace(android.R.id.content, pf);
 		FT.commit();	
+		super.onConfigurationChanged(newConfig);
 	}
-	
+	class landscape_fragment extends Fragment
+	{
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		{
+			View v = inflater.inflate(R.layout.xoboard_landscape,container,false);
+			v.setSaveFromParentEnabled(true);
+			init(v);
+			toggleText(0);
+			return v;
+		}
+	}
+	class portrait_fragment extends Fragment
+	{
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		{
+			View v = inflater.inflate(R.layout.xoboard,container,false);
+			v.setSaveFromParentEnabled(true);
+			init (v);
+			toggleText(0);
+			return v;
+		}
+	}
 	@Override
 	public void onBackPressed()
 	{
@@ -175,14 +200,31 @@ public class xo extends Activity implements Button.OnClickListener
 		}
 		for (int i=1;i < 10;i++)
 		{
-			if (t.isFree(i) && i != _pos)
-				board[i].setText("-");
+			if ( i != _pos )
+				if(t.board[i] == ' ')
+					board[i].setText("-");
+				else
+					board[i].setText(String.valueOf(t.board[i]));
 		}
 	}
 	@Override
 	public void onClick(View p1)
 	{
-		if (p1.getId() == R.id.reset) this.recreate();
+		if (p1.getId() == R.id.reset) 
+		{
+			t.board = new char[]{'-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+			toggleText(0);
+			player = t.chooseFirst();
+			isPlaying = true;
+			if (player == 'Q')
+			{
+				Toast.makeText(xo.this.getApplicationContext(), secondPlayerType + " goes first !", Toast.LENGTH_SHORT).show();
+				playSecondPlayer();
+			}
+			else if (player == 'P')
+				Toast.makeText(xo.this.getApplicationContext(), "You goes first !", Toast.LENGTH_SHORT).show();
+			S.start();
+		}
 		if (isPlaying && player == 'P')
 		{
 			switch (p1.getId())
@@ -432,25 +474,5 @@ public class xo extends Activity implements Button.OnClickListener
 		confirm.setOnClickListener(this);
 	}
 
-	public class landscape_fragment extends Fragment
-	{
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-		{
-			View v = inflater.inflate(R.layout.xoboard_landscape,container,false);
-			init(v);
-			return v;
-		}
-	}
-	public class portrait_fragment extends Fragment
-	{
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-		{
-			View v = inflater.inflate(R.layout.xoboard,container,false);
-			init (v);
-			return v;
-		}
-	}
 }
 	
