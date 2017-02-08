@@ -17,39 +17,17 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-		FM = getFragmentManager();
-		FT = FM.beginTransaction();
-		FT.replace(android.R.id.content,mf);
+    //	setContentView(R.layout.main);
+		FragmentManager FM=getFragmentManager();
+		FragmentTransaction FT= FM.beginTransaction();
+		FT.replace(android.R.id.content,new mainFragment());
 		FT.commit();
-	//	mf.setRetainInstance(true);
-	//	af.setRetainInstance(true);
-	
-        setContentView(R.layout.main);
-		Button Computer = (Button)findViewById(R.id.computer);
-		Computer.setOnClickListener(new View.OnClickListener()
-			{
-				public void onClick(View v)
-				{
-					xo.player2 ='C';
-					Intent i=new Intent(getApplicationContext(), xo.class);
-					startActivityForResult(i, 0);
-				}
-			});
-		Button Player = (Button)findViewById(R.id.player);
-		Player.setOnClickListener(new View.OnClickListener()
-			{
-				public void onClick(View v)
-				{
-					xo.player2 = 'O';
-					Intent i=new Intent(getApplicationContext(), xo.class);
-					startActivityForResult(i, 0);
-				}
-			});
+		
     }
 	@Override
     public boolean onCreateOptionsMenu(Menu menu)
 	{
-		this.menu=menu;
+		this.menu = menu;
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
@@ -59,11 +37,17 @@ public class MainActivity extends Activity
         switch (item.getItemId())
 		{
 			case R.id.about:
-				menu.setGroupVisible(R.id.menu_group,false);
-				FT = FM.beginTransaction();
-				FT.replace(android.R.id.content,af);
+				FragmentManager FM=getFragmentManager();
+				FragmentTransaction FT= FM.beginTransaction();
+				FT.replace(android.R.id.content,new Fragment(){
+						public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+						{
+							return inflater.inflate(R.layout.about,container,false);
+						}
+				});
 				FT.commit();
-				inmenu=true;
+				menu.setGroupVisible(R.id.menu_group, false);
+				inmenu = true;
 				return true;
 			case R.id.exit:
 				System.exit(0);
@@ -77,14 +61,45 @@ public class MainActivity extends Activity
 	{
 		if (inmenu)
 		{
-			FT = FM.beginTransaction();
-			FT.replace(android.R.id.content,mf);
+		//	this.recreate();
+			FragmentManager FM=getFragmentManager();
+			FragmentTransaction FT= FM.beginTransaction();
+			FT.replace(android.R.id.content,new mainFragment());
 			FT.commit();
-			menu.setGroupVisible(R.id.menu_group,true);
+			menu.setGroupVisible(R.id.menu_group, true);
 			inmenu = false;
 		}
 		else
 			super.onBackPressed();
+	}
+	class mainFragment extends Fragment
+	{
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		{
+			View v = inflater.inflate(R.layout.main,container,false);
+			Button Computer = (Button)v.findViewById(R.id.computer);
+			Computer.setOnClickListener(new View.OnClickListener()
+				{
+					public void onClick(View v)
+					{
+						xo.player2 = 'C';
+						Intent i=new Intent(getApplicationContext(), xo.class);
+						startActivityForResult(i, 0);
+					}
+				});
+			Button Player = (Button)v.findViewById(R.id.player);
+			Player.setOnClickListener(new View.OnClickListener()
+				{
+					public void onClick(View v)
+					{
+						xo.player2 = 'O';
+						Intent i=new Intent(getApplicationContext(), xo.class);
+						startActivityForResult(i, 0);
+					}
+				});
+			return v;
+		}
 	}
 }
 
