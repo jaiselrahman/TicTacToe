@@ -16,10 +16,13 @@ import android.app.FragmentTransaction;
 public class MainActivity extends Activity 
 {
 	private Menu menu;
-	private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
-	private ActionBarDrawerToggle mDrawerToggle;
+	private DrawerLayout drawerLayout;
+    private ListView drawerList;
+	private ActionBarDrawerToggle drawerToggle;
+	FragmentManager FM=getFragmentManager();
+	FragmentTransaction FT;
 	mainFragment mf = new mainFragment(this);
+	accountFragment aF = new accountFragment();
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState)
@@ -28,19 +31,16 @@ public class MainActivity extends Activity
   		setContentView(R.layout.activity_main);
 		if (savedInstanceState == null)
 		{	
-        	FragmentManager FM=getFragmentManager();
-			FragmentTransaction FT= FM.beginTransaction();
-			FT.replace(R.id.content_frame, mf);
-			FT.commit();
+			FM.beginTransaction()
+			.replace(R.id.content_frame, mf)
+			.commit();
 		}
-		mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        // set a custom shadow that overlays the main content when the drawer opens
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+		drawerList = (ListView) findViewById(R.id.left_drawer);
+  		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        drawerList.setAdapter(new ArrayAdapter<String>(this,
 												R.layout.drawer_list_item, new String[] {"Account", "About", "Exit"}));
-        mDrawerList.setOnItemClickListener(new  ListView.OnItemClickListener()
+        drawerList.setOnItemClickListener(new  ListView.OnItemClickListener()
 		{
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -48,54 +48,55 @@ public class MainActivity extends Activity
 			    switch (position)
 				{
 					case 0:
-						Toast.makeText(getApplicationContext(),"Account",Toast.LENGTH_SHORT).show();
+						FM.beginTransaction()
+						.replace(R.id.content_frame, aF)
+						.commit();
 						break;
 					case 1:
-						FragmentManager FM=getFragmentManager();
-						FragmentTransaction FT= FM.beginTransaction();
-						FT.replace(R.id.content_frame, new Fragment()
+						FM.beginTransaction()
+						.replace(R.id.content_frame, new Fragment()
 							{
 								public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 								{
 									return inflater.inflate(R.layout.about, container, false);
 								}
-							});
-						FT.commit();
+							})
+						.commit();
 						menu.setGroupVisible(R.id.menu_group, false);
 						inAbout = true;
 						break;
 					case 2:
 						System.exit(0);
 				}
-				mDrawerLayout.closeDrawer(mDrawerList);
+				drawerLayout.closeDrawer(drawerList);
 			}
 		});
 		getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
-		mDrawerToggle = new ActionBarDrawerToggle(
-		this,                  /* host Activity */
-		mDrawerLayout,         /* DrawerLayout object */
-		R.drawable.ic_launcher,  /* nav drawer image to replace 'Up' caret */
-		R.string.drawer_open,  /* "open drawer" description for accessibility */
-		R.string.drawer_close  /* "close drawer" description for accessibility */
+		drawerToggle = new ActionBarDrawerToggle(
+		this,
+		drawerLayout,
+		R.drawable.ic_launcher,
+		R.string.drawer_open,
+		R.string.drawer_close
 		)
 		{
 			public void onDrawerClosed(View view)
 			{
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                invalidateOptionsMenu();
 			}
             public void onDrawerOpened(View drawerView)
 			{
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                invalidateOptionsMenu();
 			}
 		};
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		drawerLayout.setDrawerListener(drawerToggle);
 	}
 	@Override
     protected void onPostCreate(Bundle savedInstanceState)
 	{
 		super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
+        drawerToggle.syncState();
 	}
 	@Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -110,16 +111,15 @@ public class MainActivity extends Activity
         switch (item.getItemId())
 		{
 			case R.id.about:
-				FragmentManager FM=getFragmentManager();
-				FragmentTransaction FT= FM.beginTransaction();
-				FT.replace(R.id.content_frame, new Fragment()
+				FM.beginTransaction()
+				.replace(R.id.content_frame, new Fragment()
 				{
 					public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 					{
 						return inflater.inflate(R.layout.about, container, false);
 					}
-				});
-				FT.commit();
+				})
+				.commit();
 				menu.setGroupVisible(R.id.menu_group, false);
 				inAbout = true;
 				return true;
@@ -135,10 +135,9 @@ public class MainActivity extends Activity
 	{
 		if (inAbout)
 		{
-			FragmentManager FM=getFragmentManager();
-			FragmentTransaction FT= FM.beginTransaction();
-			FT.replace(R.id.content_frame, mf);
-			FT.commit();
+			FM.beginTransaction()
+			.replace(R.id.content_frame, mf)
+			.commit();
 			menu.setGroupVisible(R.id.menu_group, true);
 			inAbout = false;
 		}
@@ -177,6 +176,17 @@ public class MainActivity extends Activity
 				}
 			});
 			return v;
+		}
+	}
+	public static class accountFragment extends Fragment
+	{
+		public accountFragment()
+		{}
+		
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		{
+			return inflater.inflate(R.layout.account,container,false); 
 		}
 	}
 }
