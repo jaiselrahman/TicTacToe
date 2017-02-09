@@ -473,6 +473,4 @@ public class xo extends Activity implements Button.OnClickListener
 		confirm = (Button)v.findViewById(R.id.confirm);
 		confirm.setOnClickListener(this);
 	}
-
 }
-	
