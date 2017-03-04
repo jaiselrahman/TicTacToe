@@ -10,57 +10,91 @@
 		android:id="@+id/accountTableLayout1"
 		android:layout_margin="10dp">
 
+		<View
+			android:background="?android:attr/dividerVertical"
+			android:layout_height="1dp"
+			android:layout_width="match_parent"/>
+
 		<TableRow
 			android:layout_height="wrap_content"
-			android:layout_width="match_parent">
+			android:layout_width="match_parent"
+			android:weightSum="10">
 
-			<TextView
+			<RelativeLayout
 				android:layout_height="match_parent"
-				android:textAppearance="?android:attr/textAppearanceLarge"
-				android:layout_width="wrap_content"
-				android:text="Your Name"
-				android:layout_weight="9"
-				android:gravity="center"
-				android:textIsSelectable="true"/>
+				android:layout_width="match_parent"
+				android:layout_weight="9">
+
+				<EditText
+					android:layout_height="match_parent"
+					android:textAppearance="?android:attr/textAppearanceLarge"
+					android:layout_width="match_parent"
+					android:id="@+id/account_name_edit"
+					android:singleLine="true"
+					android:maxLines="1"
+					android:visibility="gone"
+					android:gravity="center_vertical"/>
+
+				<TextView
+					android:layout_height="match_parent"
+					android:textAppearance="?android:attr/textAppearanceLarge"
+					android:layout_width="match_parent"
+					android:singleLine="true"
+					android:maxLines="1"
+					android:maxWidth="20dp"
+					android:layout_above="@id/account_name_edit"
+					android:id="@+id/account_name_view"
+					android:gravity="center_vertical"/>
+
+			</RelativeLayout>
 
 			<Button
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
 				android:text="Change"
+				android:id="@+id/change"
 				android:layout_weight="1"/>
 
 		</TableRow>
 
+		<View
+			android:background="?android:attr/dividerVertical"
+			android:layout_height="1dp"
+			android:layout_width="match_parent"/>
+
+		<TableRow
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:weightSum="10">
+
+			<TextView
+				android:layout_height="match_parent"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:layout_width="match_parent"
+				android:text="Friends"
+				android:gravity="center_vertical"
+				android:layout_weight="9"/>
+
+			<Button
+				android:layout_height="match_parent"
+				android:layout_width="match_parent"
+				android:text="+"
+				android:layout_span="5"
+				android:layout_weight="1"/>
+
+		</TableRow>
+
+		<View
+			android:background="?android:attr/dividerVertical"
+			android:layout_height="1dp"
+			android:layout_width="match_parent"/>
+
 	</TableLayout>
-
-	<View
-		android:background="?android:attr/dividerVertical"
-		android:layout_height="3dp"
-		android:layout_width="match_parent"
-		android:layout_below="@id/accountTableLayout1"
-		android:id="@+id/accountView1"/>
-
-	<TextView
-		android:layout_height="wrap_content"
-		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:layout_width="wrap_content"
-		android:text="Friends"
-		android:layout_below="@id/accountView1"
-		android:id="@+id/accountTextView1"
-		android:layout_centerHorizontal="true"
-		android:padding="10dp"/>
-
-	<View
-		android:background="?android:attr/dividerVertical"
-		android:layout_height="1dp"
-		android:layout_width="match_parent"
-		android:layout_below="@id/accountTextView1"
-		android:id="@+id/accountView2"/>
 
 	<ListView
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"
-		android:layout_below="@id/accountView2"/>
+		android:layout_below="@id/accountTableLayout1"/>
 
 </RelativeLayout>
 
