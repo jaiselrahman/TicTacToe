@@ -1,6 +1,230 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   <string name="app_name">Tic Tac Toe</string>
-   <string name="drawer_open">Open navigation drawer</string>
-   <string name="drawer_close">Close navigation drawer</string>
+    <string name="app_name">TicTacToe</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="exit">Exit</string>
+    <string-array name="menu_list">
+        <item>Home</item>
+        <item>Account</item>
+        <item>About</item>
+        <item>Exit</item>
+    </string-array>
+    <string name="change">Change</string>
+    <string name="password">Password</string>
+    <string name="new_passwd">New password</string>
+    <string name="reset">Reset</string>
+    <string name="start">Start</string>
+    <string name="save">Save</string>
+    <string name="confirm">Confirm</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="x">X</string>
+    <string name="o">O</string>
+    <string name="select_x_o">Select X or O</string>
+    <string name="exit_confirmation">Are you sure?\nThe current game will be lost.</string>
+    <string name="wrong_password">Wrong Password</string>
+    <string name="invalid_passwd_length">Password should atleast have atleast 6 characters</string>
+    <string name="user_name_already_exists">User Name Already Exists</string>
+    <string name="user_name_changed_successfully">User Name Changed Successfully</string>
+    <string name="user_name_setting_failed">"Setting User Name Failed\nNetwork may be slow. Try again"</string>
+    <string name="passwd_changed_successfully">Password Changed Successfully</string>
+    <string name="passwd_changing_failed">Changing Password failed</string>
+    <string name="won_the_game">You Won the Game!</string>
+    <string name="game_tie">The Game is a Tie!</string>
+    <string name="game_lost">%1$s has beaten you\nYou lose!</string>
+    <string name="goes_first">%1$s goes first!</string>
+    <string name="you_goes_first">You goes first!</string>
+    <string name="opp_goes_first">Opponent goes first!</string>
+    <string name="turn">%1$s\'s turn</string>
+    <string name="your_turn">Yours turn</string>
+    <string name="resetted_game">%1$s resetted the Game</string>
+    <string name="you_resetted_game">You resetted the Game</string>
+    <string name="started_game">%1$s started New Game</string>
+    <string name="you_started_game">You started New Game</string>
+    <string name="sending">Sending&#8230;</string>
+    <string name="starting">Starting&#8230;</string>
+    <string name="resetting">Resetting&#8230;</string>
+
+    <string name="hint_friendname">Friend Name</string>
+    <string name="search">Search</string>
+    <string name="version">Version 1.1.0</string>
+    <string name="by_jaisel_rahman">By Jaisel Rahman</string>
+    <string name="author_mail">&lt;jaiselrahman@gmail.com&gt;</string>
+    <string name="friends">Friends</string>
+    <string name="add_friends">Add Friends</string>
+    <string name="player">\u0020Player\u0020</string>
+    <string name="computer">Computer</string>
+    <string name="play_against">Play Against</string>
+    <string name="play_request_send">Play Request Send\nYou will be Notified when Accepted</string>
+    <string name="title_activity_add_friend">AddFriend</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="plus">+</string>
+    <string name="title_activity_account">Account</string>
+    <string name="nav_icon">navigation icon</string>
+    <string name="delete">Delete</string>
+    <string name="accept">Accept</string>
+    <string name="select_opponent">Select Your Opponent</string>
+    <string name="friends_online">Friends Online</string>
+    <string name="result_not_found">Result Not Found!</string>
+    <string name="select">Select</string>
+    <string name="status">Status</string>
+
+    <string name="profile">Profile</string>
+    <string name="profile_name">Profile Name</string>
+    <string name="edit">Edit</string>
+    <string name="email">Email</string>
+    <string name="delete_account">Delete Account</string>
+
+    <string name="login">Login</string>
+    <string name="new_user_get_registered_now">New User? Get Registered Now</string>
+    <string name="register">Register</string>
+    <string name="forget_password">Forget Password</string>
+
+
+    <string name="login_failed">Login failed</string>
+    <string name="password_reset_email_send">Passwor reset email send</string>
+    <string name="sending_email_failed">Sending email failed</string>
+    <string name="enter_your_registered_email">Enter your registered email</string>
+    <string name="email_changed_successfully">Email Changed Successfully</string>
+    <string name="failed_to_change_email">Failed to change Email</string>
+    <string name="failed_to_change_user_name">Failed to change User Name</string>
+    <string name="password_changed_successfully">Password Changed Successfully</string>
+    <string name="failed_to_change_password">Failed to change Password</string>
+    <string name="invalid_password">Invalid Password</string>
+    <string name="enter_current_password">Enter Current Password</string>
+    <string name="password_alteast_6_chars">Password should have atlest 6 characters</string>
+
+    <string name="hint_new_user_name">New User Name</string>
+    <string name="hint_new_email">New Email</string>
+    <string name="hint_new_password">New Password</string>
+    <string name="hint_re_enter_password">Re-enter Password</string>
+
+    <string name="re_enter_password">Re-enter Password</string>
+    <string name="email_should_not_be_empty">Email should not be empty</string>
+    <string name="password_atleast_6_chars">Password should be altest six characters</string>
+    <string name="password_should_not_be_empty">Password should not be empty</string>
+    <string name="password_does_not_matches">Password does not matches</string>
+    <string name="registering">Registering</string>
+    <string name="account_registered_successfully">Account Registered Successfully</string>
+    <string name="creating_user_failed">Creating user failed</string>
+    <string name="username_should_not_be_empty">User Name should not be empty</string>
+    <string name="account_will_deleted_permanently">Account will be deleted permanently</string>
+    <string name="account_deleted_successfully">Account Deleted Successfully</string>
+    <string name="failed_to_delete_account">Failed to delete account</string>
+
+    <string name="ad_banner">ca-app-pub-4886558654831307/6671621270</string>
+    <string name="ad_banner2">ca-app-pub-4886558654831307/3536038070</string>
+    <string name="current_password">Current Password</string>
+    <string name="phone">Phone Number</string>
+    <string name="next">Next</string>
+    <string name="enter_verification_code">Enter Verification Code</string>
+    <string name="phone91">+91</string>
+    <string name="enter_phone_no">Enter Phone Number</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+    <string name="home">Home</string>
+    <string name="account">Account</string>
+    <string name="share">Share</string>
+    <string name="about">About</string>
+    <string name="feedback">Feedback</string>
+    <string name="title_activity_scrolling">ScrollingActivity</string>
+    <string name="large_text">
+        "Material is the metaphor.\n\n"
+
+        "A material metaphor is the unifying theory of a rationalized space and a system of motion."
+        "The material is grounded in tactile reality, inspired by the study of paper and ink, yet "
+        "technologically advanced and open to imagination and magic.\n"
+        "Surfaces and edges of the material provide visual cues that are grounded in reality. The "
+        "use of familiar tactile attributes helps users quickly understand affordances. Yet the "
+        "flexibility of the material creates new affordances that supercede those in the physical "
+        "world, without breaking the rules of physics.\n"
+        "The fundamentals of light, surface, and movement are key to conveying how objects move, "
+        "interact, and exist in space and in relation to each other. Realistic lighting shows "
+        "seams, divides space, and indicates moving parts.\n\n"
+
+        "Bold, graphic, intentional.\n\n"
+
+        "The foundational elements of print based design typography, grids, space, scale, color, "
+        "and use of imagery guide visual treatments. These elements do far more than please the "
+        "eye. They create hierarchy, meaning, and focus. Deliberate color choices, edge to edge "
+        "imagery, large scale typography, and intentional white space create a bold and graphic "
+        "interface that immerse the user in the experience.\n"
+        "An emphasis on user actions makes core functionality immediately apparent and provides "
+        "waypoints for the user.\n\n"
+
+        "Motion provides meaning.\n\n"
+
+        "Motion respects and reinforces the user as the prime mover. Primary user actions are "
+        "inflection points that initiate motion, transforming the whole design.\n"
+        "All action takes place in a single environment. Objects are presented to the user without "
+        "breaking the continuity of experience even as they transform and reorganize.\n"
+        "Motion is meaningful and appropriate, serving to focus attention and maintain continuity. "
+        "Feedback is subtle yet clear. Transitions are efﬁcient yet coherent.\n\n"
+
+        "3D world.\n\n"
+
+        "The material environment is a 3D space, which means all objects have x, y, and z "
+        "dimensions. The z-axis is perpendicularly aligned to the plane of the display, with the "
+        "positive z-axis extending towards the viewer. Every sheet of material occupies a single "
+        "position along the z-axis and has a standard 1dp thickness.\n"
+        "On the web, the z-axis is used for layering and not for perspective. The 3D world is "
+        "emulated by manipulating the y-axis.\n\n"
+
+        "Light and shadow.\n\n"
+
+        "Within the material environment, virtual lights illuminate the scene. Key lights create "
+        "directional shadows, while ambient light creates soft shadows from all angles.\n"
+        "Shadows in the material environment are cast by these two light sources. In Android "
+        "development, shadows occur when light sources are blocked by sheets of material at "
+        "various positions along the z-axis. On the web, shadows are depicted by manipulating the "
+        "y-axis only. The following example shows the card with a height of 6dp.\n\n"
+
+        "Resting elevation.\n\n"
+
+        "All material objects, regardless of size, have a resting elevation, or default elevation "
+        "that does not change. If an object changes elevation, it should return to its resting "
+        "elevation as soon as possible.\n\n"
+
+        "Component elevations.\n\n"
+
+        "The resting elevation for a component type is consistent across apps (e.g., FAB elevation "
+        "does not vary from 6dp in one app to 16dp in another app).\n"
+        "Components may have different resting elevations across platforms, depending on the depth "
+        "of the environment (e.g., TV has a greater depth than mobile or desktop).\n\n"
+
+        "Responsive elevation and dynamic elevation offsets.\n\n"
+
+        "Some component types have responsive elevation, meaning they change elevation in response "
+        "to user input (e.g., normal, focused, and pressed) or system events. These elevation "
+        "changes are consistently implemented using dynamic elevation offsets.\n"
+        "Dynamic elevation offsets are the goal elevation that a component moves towards, relative "
+        "to the component’s resting state. They ensure that elevation changes are consistent "
+        "across actions and component types. For example, all components that lift on press have "
+        "the same elevation change relative to their resting elevation.\n"
+        "Once the input event is completed or cancelled, the component will return to its resting "
+        "elevation.\n\n"
+
+        "Avoiding elevation interference.\n\n"
+
+        "Components with responsive elevations may encounter other components as they move between "
+        "their resting elevations and dynamic elevation offsets. Because material cannot pass "
+        "through other material, components avoid interfering with one another any number of ways, "
+        "whether on a per component basis or using the entire app layout.\n"
+        "On a component level, components can move or be removed before they cause interference. "
+        "For example, a floating action button (FAB) can disappear or move off screen before a "
+        "user picks up a card, or it can move if a snackbar appears.\n"
+        "On the layout level, design your app layout to minimize opportunities for interference. "
+        "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
+        "when a user tries to pick up one of cards.\n\n"
+    </string>
+    <string name="profile_pic">Profile Picture</string>
 </resources>

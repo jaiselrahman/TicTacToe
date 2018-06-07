@@ -1,173 +1,176 @@
 package com.jaisel.tictactoe;
 
-
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.content.res.Configuration;
+import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.widget.DrawerLayout;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
-public class MainActivity extends Activity {
-    public static userDBHelper userDB;
-    public static accountFragment accountF = new accountFragment();
-    public static aboutFragment aboutF = new aboutFragment();
-    public static boolean inAbout = false, inAccount = false;
-    public static boolean isNoAccountName = false;
-    private mainFragment mainF = new mainFragment();
-    private Menu menu;
-    private DrawerLayout drawerLayout;
-    private ListView drawerList;
-    private ActionBarDrawerToggle drawerToggle;
-    private FragmentManager FM = getFragmentManager();
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.jaisel.tictactoe.Utils.Job;
+import com.jaisel.tictactoe.Utils.OnJobDoneListener;
+import com.jaisel.tictactoe.Utils.User;
+import com.jaisel.tictactoe.Utils.UserAccount;
 
-    private Server server = new Server("http://0.0.0.0:8080/app.php");
+import java.util.Vector;
+
+public class MainActivity extends BaseActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final UserAccount userAccount = UserAccount.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        userDB = new userDBHelper(this);
-        if (savedInstanceState == null) {
-            FM.beginTransaction()
-                    .replace(R.id.content_frame, mainF)
-                    .commit();
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        AdView mAdView = findViewById(R.id.ad_banner);
+        AdRequest.Builder adBuilder = new AdRequest.Builder();
+        if(BuildConfig.DEBUG ){
+            adBuilder.addTestDevice("8BE1E7368A43733B68CD8EB8C618A917");
         }
-        drawerList = (ListView) findViewById(R.id.left_drawer);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, new String[]{"Home", "Account", "About", "Exit"}));
-        drawerList.setItemChecked(0, true);
-        drawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                        FM.beginTransaction()
-                                .replace(R.id.content_frame, mainF)
-                                .commit();
-                        inAccount = false;
-                        inAbout = false;
-                        break;
-                    case 1:
-                        FM.beginTransaction()
-                                .replace(R.id.content_frame, new accountFragment())
-                                .commit();
-                        inAccount = true;
-                        break;
-                    case 2:
-                        FM.beginTransaction()
-                                .replace(R.id.content_frame, new aboutFragment())
-                                .commit();
-                        menu.setGroupVisible(R.id.menu_group, false);
-                        inAbout = true;
-                        break;
-                    case 3:
-                        System.exit(0);
-                }
-                drawerLayout.closeDrawer(drawerList);
+        AdRequest adRequest = adBuilder.build();
+        mAdView.loadAd(adRequest);
+
+        Button Computer = findViewById(R.id.computer);
+        Computer.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, XoActivity.class);
+                i.putExtra("PLAYERTYPE", "COMPUTER");
+                startActivity(i);
             }
         });
-        drawerToggle = new ActionBarDrawerToggle(
-                this,
-                drawerLayout,
-                R.drawable.menu2,
-                R.string.drawer_open,
-                R.string.drawer_close
-        ) {
-            public void onDrawerClosed(View view) {
-                invalidateOptionsMenu();
+
+        Button Player = findViewById(R.id.player);
+        Player.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (userAccount.getUser() == null) {
+                    startActivity(new Intent(MainActivity.this, AccountActivity.class));
+                    Toast.makeText(MainActivity.this, "Set User Name First", Toast.LENGTH_SHORT).show();
+                } else {
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.content_main, new selectOpponent())
+                            .addToBackStack(null)
+                            .commit();
+                }
+            }
+        });
+
+        handleIntent(getIntent());
+    }
+
+    private void handleIntent(Intent intent) {
+        Bundle bundle = intent.getExtras();
+        if(bundle != null ){
+            for(String a : bundle.keySet()){
+                Log.d(TAG, a + ":" + bundle.get(a));
             }
 
-            public void onDrawerOpened(View view) {
-                invalidateOptionsMenu();
+            String action = bundle.getString("action", "");
+            switch (action) {
+                case "friend_request": {
+                    Intent i = new Intent(this, AccountActivity.class);
+                    i.putExtra("FRIEND_REQUEST", true);
+                    startActivity(i);
+                    break;
+                }
+                case "play_request": {
+                    if(XoActivity.isPlaying) {
+                        Toast.makeText(this, "Already Playing", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    Intent i = new Intent(this, XoActivity.class);
+                    i.putExtra("PLAY", true);
+                    i.putExtra("PLAYER_TYPE", "PLAYER");
+                    i.putExtra("PLAYER_TURN", 2);
+                    i.putExtra("PLAYER_ID", bundle.getString("userid"));
+                    i.putExtra("PLAYER_NAME", bundle.getString("name"));
+                    startActivity(i);
+                    break;
+                }
+                case "accepted_play_request": {
+                    Intent i = new Intent(this, XoActivity.class);
+                    i.putExtra("PLAY", true);
+                    i.putExtra("PLAYER_TYPE", "PLAYER");
+                    i.putExtra("PLAYER_TURN", 1);
+                    i.putExtra("PLAYER_ID", bundle.getString("userid"));
+                    i.putExtra("PLAYER_NAME", bundle.getString("name"));
+                    startActivity(i);
+                    break;
+                }
             }
-        };
-        drawerLayout.setDrawerListener(drawerToggle);
-        getActionBar().setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
-        //getActionBar().setElevation(5f);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        this.menu = menu;
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean isDrawerOpen = drawerLayout.isDrawerOpen(drawerList);
-        menu.setGroupVisible(R.id.menu_group, !isDrawerOpen);
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        switch (item.getItemId()) {
-            case R.id.home_menu:
-                FM.beginTransaction()
-                        .replace(R.id.content_frame, new mainFragment())
-                        .commit();
-                drawerList.setItemChecked(0, true);
-                inAccount = false;
-                inAbout = false;
-                return true;
-            case R.id.account_menu:
-                FM.beginTransaction()
-                        .replace(R.id.content_frame, new accountFragment())
-                        .commit();
-                drawerList.setItemChecked(1, true);
-                inAccount = true;
-                return true;
-            case R.id.about_menu:
-                FM.beginTransaction()
-                        .replace(R.id.content_frame, new aboutFragment())
-                        .commit();
-                menu.setGroupVisible(R.id.menu_group, false);
-                drawerList.setItemChecked(2, true);
-                inAbout = true;
-                return true;
-            case R.id.exit_menu:
-                System.exit(0);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
-    public void onBackPressed() {
-        if (inAbout || inAccount) {
-            FM.beginTransaction()
-                    .replace(R.id.content_frame, new mainFragment())
-                    .commit();
-            menu.setGroupVisible(R.id.menu_group, true);
-            drawerList.setItemChecked(0, true);
-            inAbout = false;
-            inAccount = false;
-        } else
-            super.onBackPressed();
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+
+    public static class selectOpponent extends Fragment {
+        Vector<User> mFriendsList;
+        Vector<String> friendsName = new Vector<>();
+        ListView mListView;
+        int mPosition = -1;
+
+        @Nullable
+        @Override
+        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
+            View v = inflater.inflate(R.layout.select_opponent, container, false);
+            mListView = v.findViewById(R.id.select_friend_list);
+            mListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    mPosition = position;
+                }
+            });
+
+            final ArrayAdapter listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_checked, friendsName);
+            mListView.setAdapter(listAdapter);
+
+            userAccount.getFriends(new OnJobDoneListener<Vector<User>>() {
+                @Override
+                public void onComplete(Job<Vector<User>> job) {
+                    if(job.isSuccessful()) {
+                        mFriendsList = job.getResult();
+                        for (User user : mFriendsList) {
+                            friendsName.add(user.getName());
+                        }
+                        listAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
+
+            Button select = v.findViewById(R.id.select_friend_select);
+            select.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    userAccount.sendPlayRequest(mFriendsList.elementAt(mPosition).getId(), new OnJobDoneListener<Void>() {
+                        @Override
+                        public void onComplete(Job<Void> job) {
+                            if(job.isSuccessful()) {
+                                Toast.makeText(getActivity(), "Play request sent", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getActivity(), "Sending play request failed\nTry again.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            });
+            return v;
+        }
     }
 }

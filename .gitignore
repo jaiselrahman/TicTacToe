@@ -1,9 +1,9 @@
 build/
 .git/
-gradle/
 .gradle/
 .idea/
 *.iml
 gradlew
 *.properties
 *.bat
+*.log
