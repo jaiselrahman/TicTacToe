@@ -17,7 +17,10 @@ public class FirebaseIDService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Token " + refreshedToken);
-        UserAccount.getInstance().setFCMToken(refreshedToken);
+        UserAccount userAccount = UserAccount.getInstance();
+        if (userAccount != null) {
+            userAccount.setFCMToken(refreshedToken);
+        }
 
     }
 }

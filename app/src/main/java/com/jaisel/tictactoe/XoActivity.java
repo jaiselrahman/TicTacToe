@@ -25,11 +25,10 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
     private static final String TAG = XoActivity.class.getSimpleName();
     private static final String RESET_GAME = "RESET_GAME";
     private static final String START_GAME = "START_GAME";
-
+    static boolean isPlaying = false;
     private TicTacToe mTicTacToe = new TicTacToe();
     private AlertDialog.Builder chooseXO;
     private int mPosition = 0;
-    static boolean isPlaying = false;
     private Opponent mOpponent;
     private TicTacToe.PlayerType nowPlaying;
     private Button mBoard[] = new Button[10];
@@ -53,18 +52,18 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
             }
             if (b.getBoolean("PLAY")
                     && b.getString("PLAYER_TYPE", "").equals("PLAYER")) {
-                String userid = b.getString("PLAYER_ID","");
-                if(TextUtils.isEmpty(userid)) {
+                String userid = b.getString("PLAYER_ID", "");
+                if (TextUtils.isEmpty(userid)) {
                     Log.d(TAG, "PLAYER_UID Empty");
                     finish();
                 }
 
-                myDocRef = UserAccount.getInstance().getMyDocRef();
+                myDocRef = UserAccount.getInstance().getCurrentUserRef();
                 opponentDocRef = UserAccount.getUserDocRef(userid);
                 opponentDocRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-                        if(e != null && documentSnapshot != null ) {
+                        if (e != null && documentSnapshot != null) {
                             mOpponent.setMove(documentSnapshot.getLong("lastmove").intValue());
                             makeOpponentMove();
                             mStatusText.setText(getString(R.string.your_turn));
@@ -173,7 +172,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
         }
@@ -228,7 +227,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
                                     finishGame();
                                     toggleText(0);
                                     mReset.setText(getString(R.string.start));
-                                    if(mOpponent.getType() == Opponent.PLAYER){
+                                    if (mOpponent.getType() == Opponent.PLAYER) {
                                         myDocRef.update("status", RESET_GAME).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
@@ -253,10 +252,10 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
                     toggleText(0);
                 }
             } else {
-                if(mOpponent.getType() == Opponent.COMPUTER)
+                if (mOpponent.getType() == Opponent.COMPUTER)
                     chooseXO.show();
-                else if(mOpponent.getType() == Opponent.PLAYER){
-                    myDocRef.update("status",START_GAME).addOnCompleteListener(new OnCompleteListener<Void>() {
+                else if (mOpponent.getType() == Opponent.PLAYER) {
+                    myDocRef.update("status", START_GAME).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             mStatusText.setText(R.string.you_started_game);
@@ -301,7 +300,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
                     if (mTicTacToe.makePlayerMove(mPosition)) {
                         toggleText(mPosition);
                         final int pos = mPosition;
-                        if(mOpponent.getType() == Opponent.PLAYER) {
+                        if (mOpponent.getType() == Opponent.PLAYER) {
                             mStatusText.setText(getString(R.string.sending));
                             myDocRef.update("lastmove", pos).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -333,7 +332,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
 
     private void makeOpponentMove() {
         int move = mOpponent.getMove();
-        if(mTicTacToe.makeOpponentMove(move)) {
+        if (mTicTacToe.makeOpponentMove(move)) {
             toggleText(move);
             if (mTicTacToe.isWinner(mTicTacToe.getOpponent())) {
                 Toast.makeText(this, String.format(getString(R.string.game_lost), mOpponent.getName()), Toast.LENGTH_SHORT).show();
@@ -416,12 +415,12 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
         }
 
         @Override
-        int getType(){
+        int getType() {
             return COMPUTER;
         }
 
         @Override
-        String getId(){
+        String getId() {
             return "computer";
         }
 
@@ -431,7 +430,8 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
         }
 
         @Override
-        void setMove(int move){ }
+        void setMove(int move) {
+        }
 
     }
 
@@ -456,7 +456,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
         }
 
         @Override
-        int getType(){
+        int getType() {
             return PLAYER;
         }
 
@@ -466,7 +466,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
         }
 
         @Override
-        void setMove(int move){
+        void setMove(int move) {
             this.move = move;
         }
 

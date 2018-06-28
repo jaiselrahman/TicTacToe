@@ -1,35 +1,37 @@
 package com.jaisel.tictactoe.Utils;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+
 /**
  * Created by jaisel on 11/6/17.
  */
 
+@Entity
 public class User {
-    public static final int STATUS_NONE = 0;
-    public static final int STATUS_ACCEPTED = 1 ;
-    public static final int STATUS_SENT = 2;
-    public static final int STATUS_RECEIVED = 3;
 
     private String name;
+    @PrimaryKey
+    @NonNull
     private String id;
-    private String email;
-    private int status;
+    @Ignore
+    private Uri profilePic;
 
-    public User(String uid, String name, String email) {
+    public User(@NonNull String uid, String name) {
         this.id = uid;
         this.name = name;
-        this.email = email;
     }
-
-    public User(String name) {
-        this(null, name, null);
-    }
-    public User(String name, String email) {
-        this(null, name, email);
+    public User(String uid, String name, Uri profilePic) {
+        this.id = uid;
+        this.name = name;
+        this.profilePic = profilePic;
     }
 
     public User() {
-        this(null, null, null);
+        this(null, null);
     }
 
     public String getName() {
@@ -48,19 +50,22 @@ public class User {
         this.id = id;
     }
 
-    public int getStatus() {
-        return status;
+    public Uri getProfilePic() {
+        return profilePic;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setProfilePic(Uri profilePic) {
+        this.profilePic = profilePic;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj instanceof User) {
+            User otherUser = (User) obj;
+            return this.id.equals(otherUser.id);
+        }
+        return false;
     }
 }

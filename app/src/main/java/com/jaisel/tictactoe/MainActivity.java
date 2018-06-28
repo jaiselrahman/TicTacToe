@@ -23,11 +23,12 @@ import com.jaisel.tictactoe.Utils.OnJobDoneListener;
 import com.jaisel.tictactoe.Utils.User;
 import com.jaisel.tictactoe.Utils.UserAccount;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final UserAccount userAccount = UserAccount.getInstance();
+    private static UserAccount userAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +36,10 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        userAccount = UserAccount.getInstance();
         AdView mAdView = findViewById(R.id.ad_banner);
         AdRequest.Builder adBuilder = new AdRequest.Builder();
-        if(BuildConfig.DEBUG ){
+        if (BuildConfig.DEBUG) {
             adBuilder.addTestDevice("8BE1E7368A43733B68CD8EB8C618A917");
         }
         AdRequest adRequest = adBuilder.build();
@@ -55,7 +57,7 @@ public class MainActivity extends BaseActivity {
         Button Player = findViewById(R.id.player);
         Player.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (userAccount.getUser() == null) {
+                if (userAccount == null) {
                     startActivity(new Intent(MainActivity.this, AccountActivity.class));
                     Toast.makeText(MainActivity.this, "Set User Name First", Toast.LENGTH_SHORT).show();
                 } else {
@@ -72,8 +74,8 @@ public class MainActivity extends BaseActivity {
 
     private void handleIntent(Intent intent) {
         Bundle bundle = intent.getExtras();
-        if(bundle != null ){
-            for(String a : bundle.keySet()){
+        if (bundle != null) {
+            for (String a : bundle.keySet()) {
                 Log.d(TAG, a + ":" + bundle.get(a));
             }
 
@@ -86,7 +88,7 @@ public class MainActivity extends BaseActivity {
                     break;
                 }
                 case "play_request": {
-                    if(XoActivity.isPlaying) {
+                    if (XoActivity.isPlaying) {
                         Toast.makeText(this, "Already Playing", Toast.LENGTH_SHORT).show();
                         break;
                     }
@@ -119,8 +121,8 @@ public class MainActivity extends BaseActivity {
     }
 
     public static class selectOpponent extends Fragment {
-        Vector<User> mFriendsList;
-        Vector<String> friendsName = new Vector<>();
+        ArrayList<User> mFriendsList;
+        ArrayList<String> friendsName = new ArrayList<>();
         ListView mListView;
         int mPosition = -1;
 
@@ -141,11 +143,11 @@ public class MainActivity extends BaseActivity {
             final ArrayAdapter listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_checked, friendsName);
             mListView.setAdapter(listAdapter);
 
-            userAccount.getFriends(new OnJobDoneListener<Vector<User>>() {
+            userAccount.getFriends(new OnJobDoneListener<List<User>>() {
                 @Override
-                public void onComplete(Job<Vector<User>> job) {
-                    if(job.isSuccessful()) {
-                        mFriendsList = job.getResult();
+                public void onComplete(Job<List<User>> job) {
+                    if (job.isSuccessful()) {
+                        mFriendsList = (ArrayList<User>) job.getResult();
                         for (User user : mFriendsList) {
                             friendsName.add(user.getName());
                         }
@@ -158,10 +160,10 @@ public class MainActivity extends BaseActivity {
             select.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    userAccount.sendPlayRequest(mFriendsList.elementAt(mPosition).getId(), new OnJobDoneListener<Void>() {
+                    userAccount.sendPlayRequest(mFriendsList.get(mPosition).getId(), new OnJobDoneListener<Void>() {
                         @Override
                         public void onComplete(Job<Void> job) {
-                            if(job.isSuccessful()) {
+                            if (job.isSuccessful()) {
                                 Toast.makeText(getActivity(), "Play request sent", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(getActivity(), "Sending play request failed\nTry again.", Toast.LENGTH_SHORT).show();

@@ -71,7 +71,6 @@ public class Server {;
                 User user = new User();
                 user.setId(userObject.getString("id"));
                 user.setName(userObject.getString("name"));
-                user.setStatus(Integer.parseInt(userObject.getString("status")));
                 usersList.add(user);
             }
         } catch (Exception ex) {

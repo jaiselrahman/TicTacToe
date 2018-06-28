@@ -3,7 +3,6 @@ package com.jaisel.tictactoe.volley;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,43 +10,53 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.jaisel.tictactoe.R;
-import com.jaisel.tictactoe.UserItem;
+import com.jaisel.tictactoe.Utils.User;
 
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FriendsAdapter extends ArrayAdapter<UserItem> {
+public class FriendsAdapter extends ArrayAdapter<User> {
     private static final String TAG = FriendsAdapter.class.getSimpleName();
-    private static int c = 0;
-    private ArrayList<UserItem> friends;
+    private ArrayList<User> friends;
     private Context context;
 
-    public FriendsAdapter(Context context, ArrayList<UserItem> friends) {
-        super(context, R.layout.friends_list_item, friends);
+    public FriendsAdapter(Context context) {
+        super(context, R.layout.friends_list_item);
         this.context = context;
-        this.friends = friends;
-        Log.i(TAG, "FriendsAdapter: " + friends.size());
     }
 
+    public void setFriends(ArrayList<User> friends) {
+        if (friends == null) return;
+        if (this.friends == null) {
+            this.friends = new ArrayList<>();
+        }
+        this.clear();
+        this.friends.addAll(friends);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getCount() {
+        if (friends == null) return 0;
+        return friends.size();
+    }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        if(convertView == null) {
+        if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.friends_list_item, parent, false);
             ViewHolder viewHolder = new ViewHolder();
             viewHolder.friendName = convertView.findViewById(R.id.friend_name);
             viewHolder.friendPhoneNumber = convertView.findViewById(R.id.friend_phone);
             viewHolder.profilePic = convertView.findViewById(R.id.friend_pic);
             convertView.setTag(viewHolder);
-            c++;
-            Log.d(TAG, "getView: Recycled " + c);
         }
 
         ViewHolder viewHolder = (ViewHolder) convertView.getTag();
         viewHolder.friendName.setText(friends.get(position).getName());
-        viewHolder.friendPhoneNumber.setText(friends.get(position).getPhoneNumber());
+        viewHolder.friendPhoneNumber.setText(friends.get(position).getId());
         viewHolder.profilePic.setImageURI(friends.get(position).getProfilePic());
 
         return convertView;

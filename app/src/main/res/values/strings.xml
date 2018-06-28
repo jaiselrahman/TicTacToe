@@ -102,7 +102,7 @@
     <string name="hint_re_enter_password">Re-enter Password</string>
 
     <string name="re_enter_password">Re-enter Password</string>
-    <string name="email_should_not_be_empty">Email should not be empty</string>
+    <string name="phone_should_not_be_empty">Phone should not be empty</string>
     <string name="password_atleast_6_chars">Password should be altest six characters</string>
     <string name="password_should_not_be_empty">Password should not be empty</string>
     <string name="password_does_not_matches">Password does not matches</string>
@@ -227,4 +227,8 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="profile_pic">Profile Picture</string>
+    <string name="invalid_code">Invalid Code</string>
+    <string name="time_out">Time out</string>
+    <string name="get_otp">Get OTP</string>
+    <string name="invalid_phone_number">Enter valid phone number</string>
 </resources>

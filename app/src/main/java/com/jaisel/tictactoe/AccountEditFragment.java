@@ -95,7 +95,7 @@ public class AccountEditFragment extends Fragment {
                     case "email":
                         final String email = input1.getText().toString();
                         if (TextUtils.isEmpty(email)) {
-                            inputPassword.setError(getString(R.string.email_should_not_be_empty));
+                            inputPassword.setError(getString(R.string.phone_should_not_be_empty));
                             return;
                         }
                         if(isAuthenticated()) {
