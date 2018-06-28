@@ -17,14 +17,18 @@ android {
         targetSdkVersion 27
         versionCode 110
         versionName "1.1.0"
-        signingConfig signingConfigs.config
-        multiDexEnabled true
     }
     buildTypes {
         release {
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            debuggable false
             signingConfig signingConfigs.config
+        }
+        debug {
+            minifyEnabled true
+            useProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -34,16 +38,15 @@ dependencies {
     implementation 'com.android.support:customtabs:27.1.1'
     implementation 'com.android.support:support-fragment:27.1.1'
     implementation 'com.android.support:design:27.1.1'
-    implementation 'com.google.firebase:firebase-messaging:15.0.2'
+    implementation 'com.google.firebase:firebase-messaging:17.0.0'
     implementation 'com.google.android.gms:play-services-ads:15.0.1'
-    implementation 'com.google.firebase:firebase-auth:15.1.0'
-    implementation 'com.google.firebase:firebase-firestore:16.0.0'
+    implementation 'com.google.firebase:firebase-auth:16.0.2'
+    implementation 'com.google.firebase:firebase-firestore:17.0.2'
     implementation files('libs/volley.jar')
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.android.support:cardview-v7:27.1.1'
-    implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.github.mukeshsolanki:android-otpview-pinview:1.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

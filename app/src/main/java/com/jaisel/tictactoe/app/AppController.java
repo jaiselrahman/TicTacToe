@@ -1,6 +1,6 @@
 package com.jaisel.tictactoe.app;
 
-import android.support.multidex.MultiDexApplication;
+import android.app.Application;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -13,7 +13,7 @@ import com.jaisel.tictactoe.volley.LruBitmapCache;
  * Created by jaisel on 27/6/17.
  */
 
-public class AppController extends MultiDexApplication {
+public class AppController extends Application {
     public static final String TAG = AppController.class.getSimpleName();
 
     private RequestQueue mRequestQueue;
