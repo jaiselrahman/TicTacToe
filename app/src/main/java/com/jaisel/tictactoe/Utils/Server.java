@@ -19,7 +19,8 @@ import java.util.Vector;
 /**
  * Created by jaisel on 4/3/17.
  */
-public class Server {;
+public class Server {
+    ;
     private static final String TAG = "Server";
     private URL url;
     private Vector<Pair<String, String>> params = new Vector<>();
@@ -42,17 +43,17 @@ public class Server {;
     }
 
     private String getPostData() {
-        String data = "";
+        StringBuilder data = new StringBuilder();
         String join = "";
         try {
             for (Pair<String, String> s : params) {
-                data += join + URLEncoder.encode(s.first, "UTF-8") + "=" + URLEncoder.encode(s.second, "UTF-8");
+                data.append(join).append(URLEncoder.encode(s.first, "UTF-8")).append("=").append(URLEncoder.encode(s.second, "UTF-8"));
                 if (params.size() > 1) join = "&";
             }
         } catch (Exception ex) {
             Log.d(TAG, ex.getMessage());
         }
-        return data;
+        return data.toString();
     }
 
     public Vector<User> getUsers(String userid, String pattern) {

@@ -8,7 +8,7 @@ public class Job<T> {
     private T result;
     private boolean isSuccessful;
 
-    Job(T result, boolean status) {
+    public Job(T result, boolean status) {
         this.result = result;
         this.isSuccessful = status;
     }

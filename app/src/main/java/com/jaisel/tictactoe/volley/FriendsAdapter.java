@@ -31,7 +31,7 @@ public class FriendsAdapter extends ArrayAdapter<User> {
         if (this.friends == null) {
             this.friends = new ArrayList<>();
         }
-        this.clear();
+        this.friends.clear();
         this.friends.addAll(friends);
         notifyDataSetChanged();
     }

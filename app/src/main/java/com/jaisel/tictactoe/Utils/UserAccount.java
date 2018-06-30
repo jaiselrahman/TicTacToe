@@ -7,16 +7,19 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArraySet;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
@@ -31,11 +34,17 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jaisel.tictactoe.R;
 import com.jaisel.tictactoe.app.AppController;
+import com.jaisel.tictactoe.data.Constants;
+import com.jaisel.tictactoe.tasks.GetFriendsTask;
+import com.jaisel.tictactoe.tasks.UpdateFriendsTask;
 
-import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -80,6 +89,10 @@ public class UserAccount {
 
     public static DocumentReference getUserDocRef(String s) {
         return users.document(s);
+    }
+
+    public static UserDatabase getDb() {
+        return db;
     }
 
     public static void signIn(final Activity activity, final User user, @Nullable final OnJobDoneListener<AuthResult> onJobDoneListener) {
@@ -179,9 +192,9 @@ public class UserAccount {
                 .apply();
     }
 
-    private static ArrayList<User> getContacts() {
-        ArrayList<User> users = new ArrayList<>();
-
+    @Nullable
+    public static ArraySet<User> getContacts() {
+        ArraySet<User> contacts = null;
         final String[] projections = {
                 ContactsContract.Data.DISPLAY_NAME,
                 ContactsContract.Data.MIMETYPE,
@@ -196,22 +209,79 @@ public class UserAccount {
                 projections,
                 null,
                 null, null);
+
         if (cursor != null && cursor.getCount() > 0) {
+            contacts = new ArraySet<>(cursor.getCount());
             cursor.moveToFirst();
             do {
                 String mimeType = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE));
                 if (mimeType.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
                     String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
                     String phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    Pair<Boolean, String> result = getProperPhoneNumber(phoneNumber);
+                    if (!result.first) continue;
                     User user = new User();
                     user.setName(name);
-                    user.setId(phoneNumber);
-                    users.add(user);
+                    user.setId(result.second);
+                    contacts.add(user);
                 }
             } while (cursor.moveToNext());
             cursor.close();
         }
-        return users;
+        return contacts;
+    }
+
+    private static Pair<Boolean, String> getProperPhoneNumber(String phoneNumber) {
+        boolean status = true;
+        if (phoneNumber.charAt(0) == '+') {
+            if (!phoneNumber.startsWith("+91")) status = false;
+            else if (phoneNumber.length() != 13) status = false;
+        } else {
+            if (phoneNumber.length() != 10) status = false;
+            else
+                phoneNumber = "+91" + phoneNumber;
+        }
+        return new Pair<>(status, phoneNumber);
+    }
+
+    @Nullable
+    public static Job<ArraySet<String>> getFriendsFromContacts(final ArraySet<User> contacts) {
+        JSONObject jsonContacts = new JSONObject();
+        Job<ArraySet<String>> jobResult = null;
+        try {
+            for (User user : contacts) {
+                jsonContacts.accumulate("contacts", user.getId());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JsonObjectRequest contactsReq = new JsonObjectRequest(Request.Method.POST, Constants.SERVER,
+                jsonContacts, future, future);
+
+        AppController.getInstance().addToRequestQueue(contactsReq);
+        try {
+            JSONObject jsonUsers = future.get();
+            if (jsonUsers != null) {
+                JSONArray json = jsonUsers.getJSONArray("data");
+                int size = json.length();
+                ArraySet<String> friends = null;
+                if (size > 0) {
+                    friends = new ArraySet<>();
+                    for (int i = 0; i < size; i++) {
+                        friends.add(json.getString(i));
+                    }
+                }
+                jobResult = new Job<>(friends, true);
+            }
+        } catch (Exception e) {
+            if (e instanceof ExecutionException) {
+                jobResult = new Job<>(null, false);
+            } else {
+                Log.d(TAG, "getFriendsFromContacts: " + e.getMessage());
+            }
+        }
+        return jobResult;
     }
 
     public DocumentReference getCurrentUserRef() {
@@ -300,70 +370,4 @@ public class UserAccount {
         currentUserRef.update("isonline", false);
     }
 
-    private static class GetFriendsTask extends AsyncTask<Void, Void, List<User>> {
-        private OnJobDoneListener<List<User>> job;
-
-        GetFriendsTask(OnJobDoneListener<List<User>> job) {
-            this.job = job;
-        }
-
-        @Override
-        protected List<User> doInBackground(Void... voids) {
-            return db.userDao().getFriends();
-        }
-
-        @Override
-        protected void onPostExecute(List<User> users) {
-            if (job != null) {
-                if (users != null)
-                    job.onComplete(new Job<>(users, true));
-                else
-                    job.onComplete(new Job<>(users, false));
-            }
-        }
-    }
-
-    private static class UpdateFriendsTask extends AsyncTask<Void, Void, Void> {
-        private OnJobDoneListener<Void> job;
-
-        UpdateFriendsTask(OnJobDoneListener<Void> job) {
-            this.job = job;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            long startTime = System.currentTimeMillis();
-            List<User> contacts = getContacts();
-            for (final User user : contacts) {
-                String uid = user.getId();
-                if (uid.charAt(0) == '+') {
-                    if (!uid.startsWith("+91")) continue;
-                    if (uid.length() != 13) continue;
-                } else {
-                    if (uid.length() != 10) continue;
-                    uid = "+91" + uid;
-                }
-
-                try {
-                    if (Tasks.await(users.document(uid).get()).exists()) {
-                        Log.d(TAG, "doInBackground: exists " + uid);
-                        user.setId(uid);
-                        db.userDao().insert(user);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            long endTime = System.currentTimeMillis();
-            Log.d(TAG, "doInBackground: " + (endTime - startTime));
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            if (job != null) {
-                job.onComplete(new Job<>(result, true));
-            }
-        }
-    }
 }

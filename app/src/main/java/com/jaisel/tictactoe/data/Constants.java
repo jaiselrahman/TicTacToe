@@ -5,6 +5,6 @@ package com.jaisel.tictactoe.data;
  */
 
 public class Constants {
-//    public static final String SERVER = "http://10.42.0.1/TicTacToe/app.php";
-    public static final String SERVER = "http://192.168.43.87/TicTacToe/app.php";
+    //    public static final String SERVER = "http://10.42.0.1/TicTacToe/app.php";
+    public static final String SERVER = "https://us-central1-tictactoe-b022e.cloudfunctions.net/updateContacts";
 }

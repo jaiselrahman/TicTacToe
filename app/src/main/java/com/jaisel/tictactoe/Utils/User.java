@@ -24,6 +24,7 @@ public class User {
         this.id = uid;
         this.name = name;
     }
+
     public User(String uid, String name, Uri profilePic) {
         this.id = uid;
         this.name = name;
@@ -67,5 +68,10 @@ public class User {
             return this.id.equals(otherUser.id);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

@@ -231,4 +231,5 @@
     <string name="time_out">Time out</string>
     <string name="get_otp">Get OTP</string>
     <string name="invalid_phone_number">Enter valid phone number</string>
+    <string name="refresh">Refresh</string>
 </resources>

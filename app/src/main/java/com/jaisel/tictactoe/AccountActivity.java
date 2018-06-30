@@ -11,9 +11,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +31,8 @@ public class AccountActivity extends BaseActivity implements View.OnClickListene
     private static final String TAG = "AccountActivity";
     private UserAccount user = UserAccount.getInstance();
     private FriendsAdapter friendsAdapter;
+    private ImageView refresh;
+    private ProgressBar progressBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,17 +59,40 @@ public class AccountActivity extends BaseActivity implements View.OnClickListene
         if (!hasPhoneContactsPermission(android.Manifest.permission.READ_CONTACTS)) {
             requestPermission(Manifest.permission.READ_CONTACTS);
         } else {
-            updateFriends();
+            loadFriends();
         }
+
+        progressBar = findViewById(R.id.refresh_progress);
+        refresh = findViewById(R.id.refresh);
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateFriends();
+            }
+        });
     }
 
     private void updateFriends() {
+        refresh.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        user.updateFriends(new OnJobDoneListener<Void>() {
+            @Override
+            public void onComplete(Job<Void> job) {
+                if (!job.isSuccessful())
+                    Toast.makeText(AccountActivity.this, "Check your Network", Toast.LENGTH_SHORT).show();
+                else loadFriends();
+                refresh.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    private void loadFriends() {
         user.getFriends(new OnJobDoneListener<List<User>>() {
             @Override
             public void onComplete(Job<List<User>> job) {
                 if (job.isSuccessful())
                     friendsAdapter.setFriends((ArrayList<User>) job.getResult());
-                Log.d(TAG, "updateFriends: count " + friendsAdapter.getCount());
             }
         });
     }
