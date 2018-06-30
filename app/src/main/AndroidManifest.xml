@@ -55,7 +55,9 @@
         <activity
             android:name=".LoginActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".SelectOpponentActivity" />
+        <activity
+            android:name=".SelectOpponentActivity"
+            android:theme="@style/AppTheme" />
 
         <service
             android:name=".fcm.MessagingService"

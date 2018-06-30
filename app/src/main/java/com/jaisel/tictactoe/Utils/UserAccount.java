@@ -3,8 +3,6 @@ package com.jaisel.tictactoe.Utils;
 import android.app.Activity;
 import android.arch.persistence.room.Room;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
@@ -32,6 +30,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.jaisel.tictactoe.R;
 import com.jaisel.tictactoe.app.AppController;
 import com.jaisel.tictactoe.data.Constants;
@@ -173,23 +172,11 @@ public class UserAccount {
     }
 
     private static User getCurrentUser() {
-        SharedPreferences preferences = AppController.getInstance()
-                .getSharedPreferences("TicTacToe", Context.MODE_PRIVATE);
-
         return new User(
-                preferences.getString("ID", null),
-                preferences.getString("NAME", null),
-                Uri.parse(preferences.getString("PROFILE_PIC", ""))
+                firebaseUser.getPhoneNumber(),
+                firebaseUser.getDisplayName(),
+                firebaseUser.getPhotoUrl()
         );
-    }
-
-    private static void setCurrentUser(User user) {
-        AppController.getInstance().getSharedPreferences("TicTacToe", Context.MODE_PRIVATE)
-                .edit()
-                .putString("NAME", user.getName())
-                .putString("ID", user.getId())
-                .putString("PROFILE_PIC", user.getProfilePic().getPath())
-                .apply();
     }
 
     @Nullable
@@ -314,24 +301,27 @@ public class UserAccount {
         tokens.put(fcmToken, true);
         Map<String, Object> fcmtokens = new HashMap<>();
         fcmtokens.put("fcm_tokens", tokens);
-//        myDocRef.set(fcmtokens, SetOptions.merge());
+        currentUserRef.set(fcmtokens, SetOptions.merge());
     }
 
     public void getFriends(final OnJobDoneListener<List<User>> onJobCompleteListener) {
         new GetFriendsTask(onJobCompleteListener).execute();
     }
 
-    public void updateFriends(@Nullable final OnJobDoneListener<Void> jobDoneListener) {
+    public void updateFriends(final OnJobDoneListener<Void> jobDoneListener) {
         new UpdateFriendsTask(jobDoneListener).execute();
     }
 
     public void sendPlayRequest(String friendUid, final OnJobDoneListener<Void> jobDoneListener) {
+        Map<String, String> playRequest = new HashMap<>();
+        playRequest.put("name", currentUser.getName());
         getUserDocRef(friendUid).
-                collection("play_request_received").
-                add(firebaseUser.getUid())
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                collection("play_request_received")
+                .document(currentUser.getId())
+                .set(playRequest)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                    public void onComplete(@NonNull Task<Void> task) {
                         if (jobDoneListener != null)
                             jobDoneListener.onComplete(new Job<Void>(null, task.isSuccessful()));
                     }

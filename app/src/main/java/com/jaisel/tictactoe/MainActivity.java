@@ -1,30 +1,16 @@
 package com.jaisel.tictactoe;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.jaisel.tictactoe.Utils.Job;
-import com.jaisel.tictactoe.Utils.OnJobDoneListener;
-import com.jaisel.tictactoe.Utils.User;
 import com.jaisel.tictactoe.Utils.UserAccount;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -61,10 +47,7 @@ public class MainActivity extends BaseActivity {
                     startActivity(new Intent(MainActivity.this, AccountActivity.class));
                     Toast.makeText(MainActivity.this, "Set User Name First", Toast.LENGTH_SHORT).show();
                 } else {
-                    getFragmentManager().beginTransaction()
-                            .replace(R.id.content_main, new selectOpponent())
-                            .addToBackStack(null)
-                            .commit();
+                    startActivity(new Intent(MainActivity.this, SelectOpponentActivity.class));
                 }
             }
         });
@@ -118,61 +101,5 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         handleIntent(intent);
-    }
-
-    public static class selectOpponent extends Fragment {
-        ArrayList<User> mFriendsList;
-        ArrayList<String> friendsName = new ArrayList<>();
-        ListView mListView;
-        int mPosition = -1;
-
-        @Nullable
-        @Override
-        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-
-            View v = inflater.inflate(R.layout.select_opponent, container, false);
-            mListView = v.findViewById(R.id.select_friend_list);
-            mListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    mPosition = position;
-                }
-            });
-
-            final ArrayAdapter listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_checked, friendsName);
-            mListView.setAdapter(listAdapter);
-
-            userAccount.getFriends(new OnJobDoneListener<List<User>>() {
-                @Override
-                public void onComplete(Job<List<User>> job) {
-                    if (job.isSuccessful()) {
-                        mFriendsList = (ArrayList<User>) job.getResult();
-                        for (User user : mFriendsList) {
-                            friendsName.add(user.getName());
-                        }
-                        listAdapter.notifyDataSetChanged();
-                    }
-                }
-            });
-
-            Button select = v.findViewById(R.id.select_friend_select);
-            select.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    userAccount.sendPlayRequest(mFriendsList.get(mPosition).getId(), new OnJobDoneListener<Void>() {
-                        @Override
-                        public void onComplete(Job<Void> job) {
-                            if (job.isSuccessful()) {
-                                Toast.makeText(getActivity(), "Play request sent", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(getActivity(), "Sending play request failed\nTry again.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                }
-            });
-            return v;
-        }
     }
 }
