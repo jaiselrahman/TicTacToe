@@ -7,3 +7,4 @@ gradlew
 *.properties
 *.bat
 *.log
+firebase/functions/node_modules
