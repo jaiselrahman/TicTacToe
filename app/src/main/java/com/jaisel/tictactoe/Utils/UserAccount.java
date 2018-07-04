@@ -224,6 +224,7 @@ public class UserAccount {
             if (!phoneNumber.startsWith("+91")) status = false;
             else if (phoneNumber.length() != 13) status = false;
         } else {
+            phoneNumber = phoneNumber.replace(" ", "");
             if (phoneNumber.length() != 10) status = false;
             else
                 phoneNumber = "+91" + phoneNumber;
