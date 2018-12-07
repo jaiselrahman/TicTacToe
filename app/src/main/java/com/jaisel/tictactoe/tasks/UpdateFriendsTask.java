@@ -1,8 +1,8 @@
 package com.jaisel.tictactoe.tasks;
 
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.v4.util.ArraySet;
+import androidx.annotation.NonNull;
+import androidx.collection.ArraySet;
 
 import com.jaisel.tictactoe.Utils.Job;
 import com.jaisel.tictactoe.Utils.OnJobDoneListener;

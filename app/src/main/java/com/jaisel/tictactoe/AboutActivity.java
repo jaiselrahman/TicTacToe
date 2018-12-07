@@ -2,7 +2,7 @@ package com.jaisel.tictactoe;
 
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by jaisel on 26/2/17.
