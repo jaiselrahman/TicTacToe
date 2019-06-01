@@ -114,6 +114,7 @@
     <string name="account_deleted_successfully">Account Deleted Successfully</string>
     <string name="failed_to_delete_account">Failed to delete account</string>
 
+    <string name="app_id">ca-app-pub-4886558654831307~5194888076</string>
     <string name="ad_banner">ca-app-pub-4886558654831307/6671621270</string>
     <string name="ad_banner2">ca-app-pub-4886558654831307/3536038070</string>
     <string name="current_password">Current Password</string>

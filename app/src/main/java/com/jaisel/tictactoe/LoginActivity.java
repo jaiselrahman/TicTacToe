@@ -2,14 +2,15 @@ package com.jaisel.tictactoe;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.AuthResult;
 import com.jaisel.tictactoe.Utils.Job;
@@ -76,9 +77,9 @@ public class LoginActivity extends AppCompatActivity {
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (otpView.hasValidOTP()) {
+                if (!TextUtils.isEmpty(otpView.getText()) && otpView.getText().length() == 6) {
                     progressBar.setVisibility(View.VISIBLE);
-                    final String code = otpView.getOTP();
+                    final String code = otpView.getText().toString();
                     UserAccount.verifySignIn(user, code, new OnJobDoneListener<AuthResult>() {
                         @Override
                         public void onComplete(Job<AuthResult> job) {

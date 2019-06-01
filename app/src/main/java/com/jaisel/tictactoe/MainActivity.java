@@ -2,11 +2,12 @@ package com.jaisel.tictactoe;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -26,7 +27,8 @@ public class MainActivity extends BaseActivity {
         AdView mAdView = findViewById(R.id.ad_banner);
         AdRequest.Builder adBuilder = new AdRequest.Builder();
         if (BuildConfig.DEBUG) {
-            adBuilder.addTestDevice("8BE1E7368A43733B68CD8EB8C618A917");
+            adBuilder.addTestDevice("6800C57467B8570202EBD32F5B0EC0BA")
+                    .addTestDevice("B0A5AA8099D1569630280C10FA42CCD8");
         }
         AdRequest adRequest = adBuilder.build();
         mAdView.loadAd(adRequest);

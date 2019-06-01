@@ -5,12 +5,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.jaisel.tictactoe.MainActivity;
 import com.jaisel.tictactoe.R;
+import com.jaisel.tictactoe.Utils.UserAccount;
 
 import java.util.Map;
 
@@ -55,5 +58,14 @@ public class MessagingService extends FirebaseMessagingService {
             bundle.putString(entry.getKey(), entry.getValue());
         }
         return bundle;
+    }
+
+    @Override
+    public void onNewToken(String refreshedToken) {
+        Log.d(TAG, "Token " + refreshedToken);
+        UserAccount userAccount = UserAccount.getInstance();
+        if (userAccount != null) {
+            userAccount.setFCMToken(refreshedToken);
+        }
     }
 }
