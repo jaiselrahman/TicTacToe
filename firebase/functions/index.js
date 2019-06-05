@@ -37,20 +37,26 @@ exports.sendPlayRequestNotfication = functions.firestore.document("users/{user_i
   const user_id = context.params.user_id;
   const sent_user_id = context.params.sent_user_id;
   console.log('Sending notification to ', user_id);
-  if (!data.after.exists) {
-    console.log('User ', user_id, ' cancelled the friend request');
-    return Promise.resolve();
-  }
 
-  return admin.auth().getUserByPhoneNumber(sent_user_id).then((sentUserProfile) => {
+  if (data.after.exists) {
+    sendPlayRequestNotification(user_id, sent_user_id);
+  } else {
+    sendPlayRequestAcceptedNotification(sent_user_id, user_id);
+  }
+});
+
+function sendPlayRequestNotification(user_id, sent_user_id) {
+  admin.auth().getUserByPhoneNumber(sent_user_id).then((sentUserProfile) => {
     console.log('Fetched user profile', { id: sentUserProfile.phoneNumber, name: sentUserProfile.name });
+
+    const displayName = sentUserProfile.displayName || sent_user_id;
 
     const payload = {
       data: {
         title: 'You have a new Play Request!',
-        body: `${sentUserProfile.displayName} sent you Play Request`,
-        userid: sent_user_id,
-        name: `${sentUserProfile.displayName}`,
+        body: `${displayName} sent you Play Request`,
+        userId: sent_user_id,
+        name: `${displayName}`,
         photoUrl: `${sentUserProfile.photoURL}`,
         action: 'play_request',
       }
@@ -60,4 +66,27 @@ exports.sendPlayRequestNotfication = functions.firestore.document("users/{user_i
   }).catch(e => {
     console.log(e);
   });
-});
+}
+
+function sendPlayRequestAcceptedNotification(user_id, sent_user_id) {
+  admin.auth().getUserByPhoneNumber(sent_user_id).then((sentUserProfile) => {
+    console.log('Fetched user profile', { id: sentUserProfile.phoneNumber, name: sentUserProfile.name });
+
+    const displayName = sentUserProfile.displayName || sent_user_id;
+
+    const payload = {
+      data: {
+        title: 'Play Request Accepted!',
+        body: `${displayName} accepted your Play Request`,
+        userId: sent_user_id,
+        name: `${displayName}`,
+        photoUrl: `${sentUserProfile.photoURL}`,
+        action: 'play_request_accepted',
+      }
+    };
+
+    return admin.messaging().sendToTopic(user_id.replace('+', '%'), payload);
+  }).catch(e => {
+    console.log(e);
+  });
+}
