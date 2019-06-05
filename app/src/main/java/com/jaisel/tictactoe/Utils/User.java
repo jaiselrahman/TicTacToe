@@ -1,6 +1,7 @@
 package com.jaisel.tictactoe.Utils;
 
 import android.net.Uri;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
@@ -37,7 +38,10 @@ public class User {
     }
 
     public String getName() {
-        return name;
+        if(TextUtils.isEmpty(name))
+            return id;
+        else
+            return name;
     }
 
     public void setName(String name) {

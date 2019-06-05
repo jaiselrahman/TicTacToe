@@ -28,7 +28,8 @@ public class MainActivity extends BaseActivity {
         AdRequest.Builder adBuilder = new AdRequest.Builder();
         if (BuildConfig.DEBUG) {
             adBuilder.addTestDevice("6800C57467B8570202EBD32F5B0EC0BA")
-                    .addTestDevice("B0A5AA8099D1569630280C10FA42CCD8");
+                    .addTestDevice("B0A5AA8099D1569630280C10FA42CCD8")
+                    .addTestDevice("B8CC45B4F88260D23A22D7517FE4216F");
         }
         AdRequest adRequest = adBuilder.build();
         mAdView.loadAd(adRequest);
@@ -66,32 +67,27 @@ public class MainActivity extends BaseActivity {
 
             String action = bundle.getString("action", "");
             switch (action) {
-                case "friend_request": {
-                    Intent i = new Intent(this, AccountActivity.class);
-                    i.putExtra("FRIEND_REQUEST", true);
-                    startActivity(i);
-                    break;
-                }
                 case "play_request": {
                     if (XoActivity.isPlaying) {
                         Toast.makeText(this, "Already Playing", Toast.LENGTH_SHORT).show();
                         break;
                     }
+                    userAccount.acceptPlayRequest(bundle.getString("userId"), null);
                     Intent i = new Intent(this, XoActivity.class);
                     i.putExtra("PLAY", true);
                     i.putExtra("PLAYER_TYPE", "PLAYER");
                     i.putExtra("PLAYER_TURN", 2);
-                    i.putExtra("PLAYER_ID", bundle.getString("userid"));
+                    i.putExtra("PLAYER_ID", bundle.getString("userId"));
                     i.putExtra("PLAYER_NAME", bundle.getString("name"));
                     startActivity(i);
                     break;
                 }
-                case "accepted_play_request": {
+                case "play_request_accepted": {
                     Intent i = new Intent(this, XoActivity.class);
                     i.putExtra("PLAY", true);
                     i.putExtra("PLAYER_TYPE", "PLAYER");
                     i.putExtra("PLAYER_TURN", 1);
-                    i.putExtra("PLAYER_ID", bundle.getString("userid"));
+                    i.putExtra("PLAYER_ID", bundle.getString("userId"));
                     i.putExtra("PLAYER_NAME", bundle.getString("name"));
                     startActivity(i);
                     break;

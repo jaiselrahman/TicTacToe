@@ -13,7 +13,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.jaisel.tictactoe.MainActivity;
 import com.jaisel.tictactoe.R;
-import com.jaisel.tictactoe.Utils.UserAccount;
+import com.jaisel.tictactoe.app.AppController;
 
 import java.util.Map;
 
@@ -30,6 +30,8 @@ public class MessagingService extends FirebaseMessagingService {
     }
 
     private void sendNotification(RemoteMessage remoteMessage) {
+        Log.i(TAG, "Data " + remoteMessage.getData());
+
         Bundle bundle = convertMapToBundle(remoteMessage.getData());
 
         Intent intent = new Intent(this, MainActivity.class);
@@ -37,19 +39,20 @@ public class MessagingService extends FirebaseMessagingService {
         intent.putExtras(bundle);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplication(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "default");
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, AppController.NOTIFY_CHANNEL_PLAY_REQUEST);
         notificationBuilder.setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(getString(R.string.app_name))
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 
-        RemoteMessage.Notification notification = remoteMessage.getNotification();
-        if(notification != null) {
-            notificationBuilder.setContentText(notification.getTitle())
-                    .setSubText(notification.getBody());
+        Map<String, String> data = remoteMessage.getData();
+        if(!data.isEmpty()) {
+            notificationBuilder.setContentTitle(data.get("title"))
+                    .setContentText(data.get("body"))
+                    .setSubText("Click to play");
         }
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if(notificationManager != null) notificationManager.notify(0, notificationBuilder.build());
+        if(notificationManager != null) notificationManager.notify(data.get("userId").hashCode(), notificationBuilder.build());
     }
 
     public Bundle convertMapToBundle(Map<String, String> data){
@@ -58,14 +61,5 @@ public class MessagingService extends FirebaseMessagingService {
             bundle.putString(entry.getKey(), entry.getValue());
         }
         return bundle;
-    }
-
-    @Override
-    public void onNewToken(String refreshedToken) {
-        Log.d(TAG, "Token " + refreshedToken);
-        UserAccount userAccount = UserAccount.getInstance();
-        if (userAccount != null) {
-            userAccount.setFCMToken(refreshedToken);
-        }
     }
 }

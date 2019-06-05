@@ -1,6 +1,9 @@
 package com.jaisel.tictactoe.app;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -15,6 +18,7 @@ import com.jaisel.tictactoe.volley.LruBitmapCache;
 
 public class AppController extends Application {
     public static final String TAG = AppController.class.getSimpleName();
+    public static final String NOTIFY_CHANNEL_PLAY_REQUEST = "CHANNEL_PLAY_REQUEST";
     private static AppController mInstance;
     LruBitmapCache mLruBitmapCache;
     private RequestQueue mRequestQueue;
@@ -28,6 +32,14 @@ public class AppController extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if(notificationManager.getNotificationChannel(NOTIFY_CHANNEL_PLAY_REQUEST) == null) {
+                NotificationChannel channel = new NotificationChannel(NOTIFY_CHANNEL_PLAY_REQUEST, "Play Requests", NotificationManager.IMPORTANCE_HIGH);
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
     }
 
     public RequestQueue getRequestQueue() {

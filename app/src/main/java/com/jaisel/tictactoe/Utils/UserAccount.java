@@ -1,17 +1,18 @@
 package com.jaisel.tictactoe.Utils;
 
 import android.app.Activity;
-import androidx.room.Room;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.collection.ArraySet;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.collection.ArraySet;
+import androidx.room.Room;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -30,7 +31,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.jaisel.tictactoe.R;
 import com.jaisel.tictactoe.app.AppController;
 import com.jaisel.tictactoe.data.Constants;
@@ -40,6 +41,7 @@ import com.jaisel.tictactoe.tasks.UpdateFriendsTask;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,6 +165,7 @@ public class UserAccount {
                             getUserColRef()
                                     .document(user.getId())
                                     .set(userdetails);
+                            FirebaseMessaging.getInstance().subscribeToTopic(user.getId().replace('+','%'));
                             onJobDoneListener.onComplete(new Job<>(task.getResult(), task.isSuccessful()));
                         } else {
                             onJobDoneListener.onComplete(new Job<AuthResult>(null, false));
@@ -297,14 +300,6 @@ public class UserAccount {
         return currentUser.getId();
     }
 
-    public void setFCMToken(final String fcmToken) {
-        final Map<String, Boolean> tokens = new HashMap<>();
-        tokens.put(fcmToken, true);
-        Map<String, Object> fcmtokens = new HashMap<>();
-        fcmtokens.put("fcm_tokens", tokens);
-        currentUserRef.set(fcmtokens, SetOptions.merge());
-    }
-
     public void getFriends(final OnJobDoneListener<List<User>> onJobCompleteListener) {
         new GetFriendsTask(onJobCompleteListener).execute();
     }
@@ -314,12 +309,27 @@ public class UserAccount {
     }
 
     public void sendPlayRequest(String friendUid, final OnJobDoneListener<Void> jobDoneListener) {
-        Map<String, String> playRequest = new HashMap<>();
+        Map<String, Object> playRequest = new HashMap<>();
         playRequest.put("name", currentUser.getName());
+        playRequest.put("time", new Date().getTime());
         getUserDocRef(friendUid).
                 collection("play_request_received")
                 .document(currentUser.getId())
                 .set(playRequest)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (jobDoneListener != null)
+                            jobDoneListener.onComplete(new Job<Void>(null, task.isSuccessful()));
+                    }
+                });
+    }
+
+    public void acceptPlayRequest(String friendUid, final OnJobDoneListener<Void> jobDoneListener) {
+        getUserDocRef(currentUser.getId()).
+                collection("play_request_received")
+                .document(friendUid)
+                .delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -350,6 +360,7 @@ public class UserAccount {
     }
 
     public void signOut() {
+        FirebaseMessaging.getInstance().subscribeToTopic(currentUser.getId().replace('+','%'));
         auth.signOut();
     }
 
