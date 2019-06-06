@@ -3,8 +3,6 @@ package com.jaisel.tictactoe;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -13,6 +11,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -20,6 +21,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.jaisel.tictactoe.Utils.UserAccount;
+
+import java.util.Date;
 
 public class XoActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = XoActivity.class.getSimpleName();
@@ -60,21 +63,43 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
 
                 myDocRef = UserAccount.getInstance().getCurrentUserRef();
                 opponentDocRef = UserAccount.getUserDocRef(userid);
-                opponentDocRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+                opponentDocRef.collection("data").document("lastmove").addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+                    private boolean isOldData = true;
+
                     @Override
                     public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-                        if (e != null && documentSnapshot != null) {
-                            mOpponent.setMove(documentSnapshot.getLong("lastmove").intValue());
+                        if (isOldData) {
+                            isOldData = false;
+                            return;
+                        }
+                        if (documentSnapshot != null) {
+                            mOpponent.setMove(documentSnapshot.getLong("value").intValue());
                             makeOpponentMove();
                             mStatusText.setText(getString(R.string.your_turn));
+                        }
+                    }
+                });
 
-                            String status = documentSnapshot.getString("status");
+                opponentDocRef.collection("data").document("status").addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+                    private boolean isOldData = true;
+
+                    @Override
+                    public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+                        if (isOldData) {
+                            isOldData = false;
+                            return;
+                        }
+                        if (documentSnapshot != null) {
+                            String status = documentSnapshot.getString("value");
+                            Log.d(TAG, "onEvent: Status " + status);
                             if (status.equals(RESET_GAME)) {
                                 mStatusText.setText(String.format(getString(R.string.resetted_game), mOpponent.getName()));
                                 finishGame();
                                 toggleText(0);
                                 mReset.setText(getString(R.string.start));
                             } else if (status.equals(START_GAME)) {
+                                finishGame();
+                                toggleText(0);
                                 String gameStatus = String.format(getString(R.string.started_game), mOpponent.getName());
                                 isPlaying = true;
                                 mReset.setText(getString(R.string.reset));
@@ -91,24 +116,20 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
                 final String id = b.getString("PLAYER_ID");
                 final String name = b.getString("PLAYER_NAME");
                 final int turn = b.getInt("PLAYER_TURN");
-                // TODO: Accepting play request
-//                        if(success){
-//                            mOpponent = new Player(id, name);
-//                            if(turn == 2){
-//                                Toast.makeText(getApplication(), String.format(getString(R.string.goes_first), mOpponent.getName()), Toast.LENGTH_SHORT).show();
-//                                mStatusText.setText(String.format(getString(R.string.turn),name));
-//                                nowPlaying = TicTacToe.PlayerType.opponent;
-//                                mTicTacToe.setSymbol('O', 'X');
-//                            } else {
-//                                Toast.makeText(getApplication(), R.string.you_goes_first, Toast.LENGTH_SHORT).show();
-//                                mStatusText.setText(getString(R.string.your_turn));
-//                                nowPlaying = TicTacToe.PlayerType.player;
-//                                mTicTacToe.setSymbol('X', 'O');
-//                            }
-//                            isPlaying = true;
-//                        } else {
-//                            Toast.makeText(getApplication(),"Starting Game Failed", Toast.LENGTH_SHORT).show();
-//                        }
+
+                mOpponent = new Player(id, name);
+                if (turn == 2) {
+                    Toast.makeText(getApplication(), String.format(getString(R.string.goes_first), mOpponent.getName()), Toast.LENGTH_SHORT).show();
+                    mStatusText.setText(String.format(getString(R.string.turn), name));
+                    nowPlaying = TicTacToe.PlayerType.opponent;
+                    mTicTacToe.setSymbol('O', 'X');
+                } else {
+                    Toast.makeText(getApplication(), R.string.you_goes_first, Toast.LENGTH_SHORT).show();
+                    mStatusText.setText(getString(R.string.your_turn));
+                    nowPlaying = TicTacToe.PlayerType.player;
+                    mTicTacToe.setSymbol('X', 'O');
+                }
+                isPlaying = true;
 //
             } else {
                 mStatusHeader.setText("");
@@ -179,83 +200,42 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
         return super.onOptionsItemSelected(item);
     }
 
-//    private class MoveReceiver extends BroadcastReceiver{
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            if(intent.getAction().equals(INTENT_RECEIVE_MOVE)) {
-//                Bundle b = intent.getExtras();
-//                Log.d(TAG, "MoveReceiver");
-//                for(String key : b.keySet()){
-//                    Log.d(TAG, "key " + key + ": value " + b.get(key));
-//                }
-//                if (b.getBoolean("MOVE_DATA")) {
-//                    String userid = b.getString("USERID");
-//                    if (userid.equals(mOpponent.getId())) {
-//                        int move = b.getInt("MOVE");
-//                        mOpponent.setMove(move);
-//                        makeOpponentMove();
-//                        mStatusText.setText(getString(R.string.your_turn));
-//                    }
-//                } else if (b.getBoolean("RESET_GAME")){
-//                    mStatusText.setText(String.format(getString(R.string.resetted_game), mOpponent.getName()));
-//                    finishGame();
-//                    toggleText(0);
-//                    mReset.setText(getString(R.string.start));
-//                } else if (b.getBoolean("START_GAME")){
-//                    String status = String.format(getString(R.string.started_game), mOpponent.getName());
-//                    isPlaying = true;
-//                    mReset.setText(getString(R.string.reset));
-//                    if(nowPlaying == TicTacToe.PlayerType.player)
-//                        mStatusText.setText(status +"\n" + getString(R.string.your_turn));
-//                    else if (nowPlaying == TicTacToe.PlayerType.opponent)
-//                        mStatusText.setText(status + "\n" + String.format(getString(R.string.turn), mOpponent.getName()));
-//                }
-//            }
-//        }
-//    }
-
     @Override
     public void onClick(View p1) {
         if (p1.getId() == R.id.reset) {
             if (mReset.getText().equals(getString(R.string.reset))) {
-                if (isPlaying) {
-                    DialogInterface.OnClickListener gameResetListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    finishGame();
-                                    toggleText(0);
-                                    mReset.setText(getString(R.string.start));
-                                    if (mOpponent.getType() == Opponent.PLAYER) {
-                                        myDocRef.update("status", RESET_GAME).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                mStatusText.setText(R.string.you_resetted_game);
-                                            }
-                                        });
-                                    }
-                                    break;
+                DialogInterface.OnClickListener gameResetListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                finishGame();
+                                toggleText(0);
+                                mReset.setText(getString(R.string.start));
+                                if (mOpponent.getType() == Opponent.PLAYER) {
+                                    myDocRef.collection("data").document("status").update("value", RESET_GAME, "time", new Date().getTime()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            mStatusText.setText(R.string.you_resetted_game);
+                                        }
+                                    });
+                                }
+                                break;
 
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    break;
-                            }
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
                         }
-                    };
-                    new AlertDialog.Builder(this).setMessage(getString(R.string.exit_confirmation))
-                            .setPositiveButton(getString(R.string.yes), gameResetListener)
-                            .setNegativeButton(getString(R.string.no), gameResetListener)
-                            .show();
-                } else {
-                    mReset.setText(getString(R.string.start));
-                    finishGame();
-                    toggleText(0);
-                }
+                    }
+                };
+                new AlertDialog.Builder(this).setMessage(getString(R.string.exit_confirmation))
+                        .setPositiveButton(getString(R.string.yes), gameResetListener)
+                        .setNegativeButton(getString(R.string.no), gameResetListener)
+                        .show();
             } else {
                 if (mOpponent.getType() == Opponent.COMPUTER)
                     chooseXO.show();
                 else if (mOpponent.getType() == Opponent.PLAYER) {
-                    myDocRef.update("status", START_GAME).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    myDocRef.collection("data").document("status").update("value", START_GAME, "time", new Date().getTime()).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             mStatusText.setText(R.string.you_started_game);
@@ -302,7 +282,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
                         final int pos = mPosition;
                         if (mOpponent.getType() == Opponent.PLAYER) {
                             mStatusText.setText(getString(R.string.sending));
-                            myDocRef.update("lastmove", pos).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            myDocRef.collection("data").document("lastmove").update("value", pos, "time", new Date().getTime()).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     mStatusText.setText(String.format(getString(R.string.turn), mOpponent.getName()));
@@ -359,6 +339,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
         mTicTacToe.clear();
         mPosition = 0;
         isPlaying = false;
+        mReset.setText(getString(R.string.start));
     }
 
     @Override

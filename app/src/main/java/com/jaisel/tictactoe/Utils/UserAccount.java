@@ -64,7 +64,7 @@ public class UserAccount {
     private User currentUser;
 
     private UserAccount(User user) {
-        currentUserRef = users.document(firebaseUser.getUid());
+        currentUserRef = users.document(user.getId());
         currentUser = user;
     }
 
