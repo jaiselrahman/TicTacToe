@@ -32,12 +32,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
 }
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
     implementation 'androidx.fragment:fragment:1.1.0-alpha02'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
 
     implementation 'com.google.android.material:material:1.1.0-alpha01'
 
@@ -53,6 +57,7 @@ dependencies {
     implementation 'com.github.mukeshsolanki:android-otpview-pinview:2.0.3'
 
     annotationProcessor "androidx.room:room-compiler:2.1.0-alpha03"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.0.0"
 }
 
 apply plugin: 'com.google.gms.google-services'

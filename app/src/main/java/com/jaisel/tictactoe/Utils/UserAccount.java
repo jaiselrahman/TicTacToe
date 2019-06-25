@@ -123,7 +123,6 @@ public class UserAccount {
 
                     @Override
                     public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                        super.onCodeSent(s, forceResendingToken);
                         verificationCode = s;
                     }
 
@@ -158,14 +157,22 @@ public class UserAccount {
                             UserProfileChangeRequest.Builder userProfileChangeRequest = new UserProfileChangeRequest.Builder();
                             userProfileChangeRequest.setDisplayName(user.getName());
                             firebaseUser.updateProfile(userProfileChangeRequest.build());
-                            Map<String, Object> userdetails = new HashMap<>();
-                            userdetails.put("lastmove", 0);
-                            userdetails.put("status", "");
-                            userdetails.put("isonline", true);
                             getUserColRef()
                                     .document(user.getId())
-                                    .set(userdetails);
-                            FirebaseMessaging.getInstance().subscribeToTopic(user.getId().replace('+','%'));
+                                    .collection("data")
+                                    .document("lastmove")
+                                    .set(MapUtils.from("value", "0"));
+                            getUserColRef()
+                                    .document(user.getId())
+                                    .collection("data")
+                                    .document("status")
+                                    .set(MapUtils.from("value", "START_GAME"));
+                            getUserColRef()
+                                    .document(user.getId())
+                                    .collection("data")
+                                    .document("isonline")
+                                    .set(MapUtils.from("value", "true"));
+                            FirebaseMessaging.getInstance().subscribeToTopic(user.getId().replace('+', '%'));
                             onJobDoneListener.onComplete(new Job<>(task.getResult(), task.isSuccessful()));
                         } else {
                             onJobDoneListener.onComplete(new Job<AuthResult>(null, false));
@@ -240,9 +247,11 @@ public class UserAccount {
         JSONObject jsonContacts = new JSONObject();
         Job<ArraySet<String>> jobResult = null;
         try {
+            JSONArray contactsArray = new JSONArray();
             for (User user : contacts) {
-                jsonContacts.accumulate("contacts", user.getId());
+                contactsArray.put(user.getId());
             }
+            jsonContacts.put("contacts", contactsArray);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -360,7 +369,7 @@ public class UserAccount {
     }
 
     public void signOut() {
-        FirebaseMessaging.getInstance().subscribeToTopic(currentUser.getId().replace('+','%'));
+        FirebaseMessaging.getInstance().subscribeToTopic(currentUser.getId().replace('+', '%'));
         auth.signOut();
     }
 

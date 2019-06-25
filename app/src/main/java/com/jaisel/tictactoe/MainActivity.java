@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity {
         Computer.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, XoActivity.class);
-                i.putExtra("PLAYERTYPE", "COMPUTER");
+                i.putExtra(XoActivity.PLAYER_TYPE, XoActivity.TYPE_COMPUTER);
                 startActivity(i);
             }
         });
@@ -68,27 +68,25 @@ public class MainActivity extends BaseActivity {
             String action = bundle.getString("action", "");
             switch (action) {
                 case "play_request": {
-                    if (XoActivity.isPlaying) {
+                    if (XoActivity.isPlaying()) {
                         Toast.makeText(this, "Already Playing", Toast.LENGTH_SHORT).show();
                         break;
                     }
                     userAccount.acceptPlayRequest(bundle.getString("userId"), null);
                     Intent i = new Intent(this, XoActivity.class);
-                    i.putExtra("PLAY", true);
-                    i.putExtra("PLAYER_TYPE", "PLAYER");
-                    i.putExtra("PLAYER_TURN", 2);
-                    i.putExtra("PLAYER_ID", bundle.getString("userId"));
-                    i.putExtra("PLAYER_NAME", bundle.getString("name"));
+                    i.putExtra(XoActivity.PLAYER_TYPE, XoActivity.TYPE_PLAYER);
+                    i.putExtra(XoActivity.PLAYER_TURN, 2);
+                    i.putExtra(XoActivity.PLAYER_ID, bundle.getString("userId"));
+                    i.putExtra(XoActivity.PLAYER_NAME, bundle.getString("name"));
                     startActivity(i);
                     break;
                 }
                 case "play_request_accepted": {
                     Intent i = new Intent(this, XoActivity.class);
-                    i.putExtra("PLAY", true);
-                    i.putExtra("PLAYER_TYPE", "PLAYER");
-                    i.putExtra("PLAYER_TURN", 1);
-                    i.putExtra("PLAYER_ID", bundle.getString("userId"));
-                    i.putExtra("PLAYER_NAME", bundle.getString("name"));
+                    i.putExtra(XoActivity.PLAYER_TYPE, XoActivity.TYPE_PLAYER);
+                    i.putExtra(XoActivity.PLAYER_TURN, 1);
+                    i.putExtra(XoActivity.PLAYER_ID, bundle.getString("userId"));
+                    i.putExtra(XoActivity.PLAYER_NAME, bundle.getString("name"));
                     startActivity(i);
                     break;
                 }
