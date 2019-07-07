@@ -7,9 +7,26 @@ import androidx.lifecycle.MutableLiveData;
 import com.jaisel.tictactoe.TicTacToe;
 import com.jaisel.tictactoe.Utils.OnJobDoneListener;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public class Computer extends Opponent {
     private MutableLiveData<Integer> move = new MutableLiveData<>();
     private TicTacToe t;
+    private Executor executor = Executors.newSingleThreadExecutor();
+    private Runnable makeMove = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(1000);
+                int pos = t.compMove();
+                if (pos > 0)
+                    move.postValue(pos);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     public Computer(TicTacToe _t) {
         t = _t;
@@ -36,9 +53,7 @@ public class Computer extends Opponent {
 
     @Override
     public void setOpponentMove(int position, @Nullable OnJobDoneListener onJobDoneListener) {
-        int pos = t.compMove();
-        if (pos > 0)
-            move.setValue(pos);
+        executor.execute(makeMove);
     }
 
     @Override
