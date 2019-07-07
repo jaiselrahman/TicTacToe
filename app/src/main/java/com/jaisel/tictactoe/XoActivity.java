@@ -1,5 +1,6 @@
 package com.jaisel.tictactoe;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -8,7 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -35,10 +35,11 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
     private static final String TAG = XoActivity.class.getSimpleName();
     private static TicTacToe.NowPlaying nowPlaying = NONE;
 
-    private TicTacToe ticTacToe = new TicTacToe();
-    private AlertDialog.Builder chooseXO;
     private int position = 0;
+    private int playerTurn = 0;
     private Opponent opponent;
+    private TicTacToe ticTacToe = new TicTacToe();
+
     private Button board[] = new Button[10];
     private Button reset;
     private TextView statusText;
@@ -65,7 +66,6 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
             public void onChanged(Integer move) {
                 if (isPlaying()) {
                     makeOpponentMove(move);
-                    statusText.setText(getString(R.string.your_turn));
                 }
             }
         });
@@ -80,11 +80,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
                 } else if (status.equals(TicTacToeController.START_GAME)) {
                     resetGame();
                     reset.setText(getString(R.string.reset));
-                    String gameStatus = String.format(getString(R.string.started_game), opponent.getName());
-                    if (nowPlaying == TicTacToe.NowPlaying.PLAYER)
-                        statusText.setText(gameStatus + "\n" + getString(R.string.your_turn));
-                    else if (nowPlaying == TicTacToe.NowPlaying.OPPONENT)
-                        statusText.setText(gameStatus + "\n" + String.format(getString(R.string.turn), opponent.getName()));
+                    startGame(OPPONENT);
                 }
             }
         });
@@ -122,6 +118,8 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
     }
 
     public Opponent initComputer() {
+        final Computer computer = new Computer(ticTacToe);
+
         DialogInterface.OnClickListener chooseXOListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -137,50 +135,40 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
                         return;
                 }
                 if (ticTacToe.chooseFirst() == TicTacToe.NowPlaying.OPPONENT) {
-                    Toast.makeText(XoActivity.this.getApplicationContext(), getString(R.string.opp_goes_first), Toast.LENGTH_SHORT).show();
                     nowPlaying = TicTacToe.NowPlaying.OPPONENT;
-                    //To initiate Opponent move
-                    opponent.setOpponentMove(0, null);
+                    statusText.setText(getString(R.string.opp_goes_first) + "\n" + getString(R.string.turn, opponent.getName()));
+                    computer.makeFirstMove();
                 } else {
-                    Toast.makeText(XoActivity.this.getApplicationContext(), getString(R.string.you_goes_first), Toast.LENGTH_SHORT).show();
                     nowPlaying = TicTacToe.NowPlaying.PLAYER;
+                    statusText.setText(getString(R.string.you_goes_first) + "\n" + getString(R.string.your_turn));
                 }
             }
         };
 
-        chooseXO = new AlertDialog.Builder(XoActivity.this);
+        AlertDialog.Builder chooseXO = new AlertDialog.Builder(XoActivity.this);
         chooseXO.setMessage(getString(R.string.select_x_o))
                 .setPositiveButton(getString(R.string.o), chooseXOListener)
                 .setNegativeButton(getString(R.string.x), chooseXOListener)
                 .setNeutralButton(getString(R.string.exit), chooseXOListener)
                 .setCancelable(false)
                 .show();
-        return new Computer(ticTacToe);
+        return computer;
     }
 
     public Opponent initPlayer(Bundle b) {
         final String id = b.getString(PLAYER_ID, "");
         if (TextUtils.isEmpty(id)) {
-            Log.d(TAG, "PLAYER_ID Empty");
+            Log.w(TAG, "PLAYER_ID Empty");
             finish();
         }
 
         final String name = b.getString(PLAYER_NAME);
-        final int turn = b.getInt(PLAYER_TURN);
+        playerTurn = b.getInt(PLAYER_TURN);
 
         opponent = new Player(this, id, name);
 
-        if (turn == 2) {
-            Toast.makeText(getApplication(), String.format(getString(R.string.goes_first), opponent.getName()), Toast.LENGTH_SHORT).show();
-            statusText.setText(String.format(getString(R.string.turn), name));
-            nowPlaying = TicTacToe.NowPlaying.OPPONENT;
-            ticTacToe.setSymbol('O', 'X');
-        } else {
-            Toast.makeText(getApplication(), R.string.you_goes_first, Toast.LENGTH_SHORT).show();
-            statusText.setText(getString(R.string.your_turn));
-            nowPlaying = TicTacToe.NowPlaying.PLAYER;
-            ticTacToe.setSymbol('X', 'O');
-        }
+        startGame(NONE);
+
         return opponent;
     }
 
@@ -224,20 +212,23 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
         if (ticTacToe.makePlayerMove(position)) {
             toggleText(position);
 
+            int curPosition = position;
+
             if (ticTacToe.isWinner(ticTacToe.getPlayer())) {
                 showWinner();
             } else if (ticTacToe.isFull()) {
-                Toast.makeText(getApplication(), getString(R.string.game_tie), Toast.LENGTH_SHORT).show();
                 showTie();
             } else {
                 nowPlaying = OPPONENT;
+                statusText.setText(getString(R.string.sending));
             }
 
-            statusText.setText(getString(R.string.sending));
-            opponent.setOpponentMove(position, new OnJobDoneListener<Void>() {
+            opponent.setOpponentMove(curPosition, new OnJobDoneListener<Void>() {
                 @Override
                 public void onComplete(Job<Void> job) {
-                    statusText.setText(String.format(getString(R.string.turn), opponent.getName()));
+                    if(isPlaying()) {
+                        statusText.setText(String.format(getString(R.string.turn), opponent.getName()));
+                    }
                 }
             });
         }
@@ -272,17 +263,35 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
         } else {
             resetGame();
 
-            if (opponent.getType() == Opponent.COMPUTER)
-                chooseXO.show();
+            startGame(PLAYER);
 
             opponent.setOpponentStatus(TicTacToeController.START_GAME, new OnJobDoneListener<Void>() {
                 @Override
                 public void onComplete(Job<Void> job) {
-                    statusText.setText(R.string.you_started_game);
+                    reset.setText(getString(R.string.reset));
                 }
             });
+        }
+    }
 
-            reset.setText(getString(R.string.reset));
+    @SuppressLint("SetTextI18n")
+    private void startGame(TicTacToe.NowPlaying startedBy) {
+        String startedByStatus = "";
+        if(startedBy == PLAYER) {
+            startedByStatus = getString(R.string.you_started_game) + "\n";
+        } else if(startedBy == OPPONENT) {
+            startedByStatus = getString(R.string.started_game, opponent.getName()) + "\n";
+        }
+
+        if (playerTurn == 2) {
+            nowPlaying = TicTacToe.NowPlaying.OPPONENT;
+            ticTacToe.setSymbol('O', 'X');
+            statusText.setText(startedByStatus + getString(R.string.turn, opponent.getName()));
+            opponent.makeFirstMove();
+        } else {
+            nowPlaying = TicTacToe.NowPlaying.PLAYER;
+            ticTacToe.setSymbol('X', 'O');
+            statusText.setText(startedByStatus + getString(R.string.your_turn));
         }
     }
 
@@ -294,6 +303,7 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
             } else if (ticTacToe.isFull()) {
                 showTie();
             } else {
+                statusText.setText(getString(R.string.your_turn));
                 nowPlaying = PLAYER;
             }
         }
@@ -347,15 +357,17 @@ public class XoActivity extends AppCompatActivity implements View.OnClickListene
 
     private void showWinner() {
         if (nowPlaying == OPPONENT) {
-            Toast.makeText(this, getString(R.string.game_lost, opponent.getName()), Toast.LENGTH_SHORT).show();
+            playerTurn = 2;
+            statusText.setText(getString(R.string.game_lost, opponent.getName()));
         } else {
-            Toast.makeText(getApplication(), getString(R.string.won_the_game), Toast.LENGTH_SHORT).show();
+            playerTurn = 1;
+            statusText.setText(R.string.won_the_game);
         }
         finishGame();
     }
 
     private void showTie() {
-        Toast.makeText(this, getString(R.string.game_tie), Toast.LENGTH_SHORT).show();
+        statusText.setText(getString(R.string.game_tie));
         finishGame();
     }
 

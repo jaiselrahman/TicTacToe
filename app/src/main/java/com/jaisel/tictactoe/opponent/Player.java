@@ -33,11 +33,6 @@ public class Player extends Opponent {
     }
 
     @Override
-    public int getType() {
-        return PLAYER;
-    }
-
-    @Override
     public LiveData<Integer> getMove() {
         return move;
     }

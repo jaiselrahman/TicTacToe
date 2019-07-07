@@ -161,7 +161,7 @@ public class UserAccount {
                                     .document(user.getId())
                                     .collection("data")
                                     .document("lastmove")
-                                    .set(MapUtils.from("value", "0"));
+                                    .set(MapUtils.from("value", 0));
                             getUserColRef()
                                     .document(user.getId())
                                     .collection("data")
@@ -171,7 +171,7 @@ public class UserAccount {
                                     .document(user.getId())
                                     .collection("data")
                                     .document("isonline")
-                                    .set(MapUtils.from("value", "true"));
+                                    .set(MapUtils.from("value", true));
                             FirebaseMessaging.getInstance().subscribeToTopic(user.getId().replace('+', '%'));
                             onJobDoneListener.onComplete(new Job<>(task.getResult(), task.isSuccessful()));
                         } else {

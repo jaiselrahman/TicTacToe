@@ -21,11 +21,6 @@ public class Computer extends Opponent {
     }
 
     @Override
-    public int getType() {
-        return COMPUTER;
-    }
-
-    @Override
     public String getId() {
         return "computer";
     }
@@ -49,5 +44,10 @@ public class Computer extends Opponent {
     @Override
     public void setOpponentStatus(String status, @Nullable OnJobDoneListener onJobDoneListener) {
         // Do nothing
+    }
+
+    @Override
+    public void makeFirstMove() {
+        setOpponentMove(0, null);
     }
 }
